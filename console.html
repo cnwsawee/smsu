@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
+<style type="text/css">
+	.progress{
+		position: absolute;left:50.5%;top:40%;width: 100%;height:50%;opacity: 0.8; filter: alpha(opacity=80);
+	}
+	.progress-bar{
+		position:absolute;top:30%; width: 100%;height: 70%;
+	}
+</style>
+</head>
+<body>	
+	<div class="container1">
+		<div class="row">
+			<div class="col-md-4"> Player
+				<span class="form-group">
+					<input type="text" id="team">
+				</span>
+			</div>
+			<div class="col-md-8"> 
+				<div class="row"> HP
+					<span class="form-group">
+						<input type="text" id="hp">
+					</span>
+				</div>
+				<div class="row"> MP
+					<span class="form-group">
+						<input type="text" id="mp">
+					</span>
+				</div>
+				<div class="row"> KP
+					<span class="form-group">
+						<input type="text" id="kp">
+					</span>
+				</div>
+				<div class="row"> XP
+					<span class="form-group">
+						<input type="text" id="xp">
+					</span>
+				</div>
+			</div>
+		<button type="button" class="btn btn-primary" id="submit">0</button>
+		</div>
+	</div>
+	<script src="./socket.io.js"></script>
+	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+	<script >
+		(function(){
+			
+			var socket = io();
+			$(document).ready(function(){
+				$("#submit").click(function(){
+					var arr=[];
+					arr.push(parseInt($('#team').val()));
+					arr.push(parseInt($('#hp').val()));
+					arr.push(parseInt($('#mp').val()));
+					arr.push(parseInt($('#kp').val()));
+					arr.push(parseInt($('#xp').val()));
+					console.log(arr);
+					socket.emit('console',arr);
+				});
+			});
+		})();
+
+		
+	</script>
+</body>
