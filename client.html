@@ -17,12 +17,60 @@
 	<div class="container1">
 		<div class="row">
 			<div class="col-md-4">
-				picture
+				<div class="form-group">
+    				<label for="exampleFormControlSelect1">
+    					Event select
+    				</label>
+    				<select class="form-control" id="selectEvent">
+      					<option>rg1</option>
+					    <option>rg2</option>
+					    <option>rg3</option>
+					    <option>rg4</option>
+				 	    <option>rg5</option>
+				 	    <option>rg6</option>
+				 	    <option>kn1</option>
+				 	    <option>kn2</option>
+				 	    <option>kn3</option>
+				 	    <option>kn4</option>
+				 	    <option>kn5</option>
+				 	    <option>kn6</option>
+				 	    <option>kn7</option>
+				 	    <option>kn8</option>
+				 	    <option>xp1</option>
+				 	    <option>xp2</option>
+				 	    <option>xp3</option>
+				 	    <option>xp4</option>
+				 	    <option>xp5</option>
+				 	    <option>xp6</option>
+				 	    <option>xp7</option>
+    				</select>
+    				<br>
+    				<button type="button" class="btn btn-primary" id="submitEvent">Submit Event</button>
+  				</div>
 			</div>
 			<div class="col-md-8">
-				<div class="row">Int</div>
-				<div class="row">Res</div>
-				<div class="row">Phy</div>
+				<div class="row">
+					Phy
+					<span class="form-group">
+						<input type="text" id="phy">
+					</span>
+				</div>
+				<div class="row">
+					Res
+					<span class="form-group">
+						<input type="text" id="res">
+					</span>
+				</div>
+				<div class="row">
+					Int
+					<span class="form-group">
+						<input type="text" id="int">
+					</span>
+				</div>
+				<div class="row">
+
+					<button type="button" class="btn btn-primary" id="submitStat">Submit Stat</button>
+				</div>
 			</div>
 		</div>
 		<div class="row" style="height: 500px; width: 1000px;">
@@ -71,14 +119,14 @@
 			
 			var socket = io();
 			var username = window.location.pathname.substr(5, window.location.pathname.length);
-			console.log(username);
+			//console.log(username);
 			var upd = function(name, val){
 				val=val*5;
 				$('#'+name).css('height',val+'%').attr('aria-valuenow'+val);
 				$('#'+name).css('top',100-val+'%')
 				$("#"+name).text(val/5);
 			}			
-			console.log('update'+username);
+			//console.log('update'+username);
 			
 			$(document).ready(function(){
 				if(socket !== undefined){
@@ -89,11 +137,50 @@
 				temp[0]=username;
 				socket.emit('console',temp);
 				socket.on('update'+ username, function(data){
-					console.log(4);
+					//console.log(4);
 					upd('hp',data[1]);
 					upd('mp',data[2]);
 					upd('kp',data[3]);
 					upd('xp',data[4]);
+				});
+				$("#submitStat").click(function(){
+					var arr=[];
+					arr.push(parseInt(username));
+					arr.push(parseInt($('#phy').val()));
+					arr.push(parseInt($('#res').val()));
+					arr.push(parseInt($('#int').val()));
+					//console.log(arr);
+					socket.emit("sendStat",arr);
+				});
+				$("#submitEvent").click(function(){
+					var arr2=[0,0,0,0,0];
+					var sel=$("#selectEvent").val();
+					//console.log($("#selectEvent").val());
+					switch (sel){
+						case 'rg1' : arr2=[parseInt(username),3,1,0,0]; break;
+						case 'rg2' : arr2=[parseInt(username),0,2,0,1]; break;
+						case 'rg3' : arr2=[parseInt(username),-1,2,-1,1]; break;
+						case 'rg4' : arr2=[parseInt(username),1,1,0,1]; break;
+						case 'rg5' : arr2=[parseInt(username),2,1,0,0]; break;
+						case 'rg6' : arr2=[parseInt(username),1,2,-1,1]; break;
+						case 'kn1' : arr2=[parseInt(username),-3,-2,5,0]; break;
+						case 'kn2' : arr2=[parseInt(username),-3,-4,6,0]; break;
+						case 'kn3' : arr2=[parseInt(username),-3,-4,5,0]; break;
+						case 'kn4' : arr2=[parseInt(username),-2,-1,3,0]; break;
+						case 'kn5' : arr2=[parseInt(username),-3,-3,4,1]; break;
+						case 'kn6' : arr2=[parseInt(username),-2,0,1,0]; break;
+						case 'kn7' : arr2=[parseInt(username),-1,-2,2,1]; break;
+						case 'kn8' : arr2=[parseInt(username),-3,-2,4,1]; break;
+						case 'xp1' : arr2=[parseInt(username),-2,3,0,4]; break;
+						case 'xp2' : arr2=[parseInt(username),-2,0,1,5]; break;
+						case 'xp3' : arr2=[parseInt(username),0,2,1,3]; break;
+						case 'xp4' : arr2=[parseInt(username),0,2,0,2]; break;
+						case 'xp5' : arr2=[parseInt(username),-1,0,0,3]; break;
+						case 'xp6' : arr2=[parseInt(username),-2,1,0,3]; break;
+						case 'xp7' : arr2=[parseInt(username),-2,3,-1,3]; break;
+					}
+					socket.emit('console',arr2);
+					//console.log(arr2);
 				});
 			});
 		})();

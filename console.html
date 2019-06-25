@@ -43,7 +43,8 @@
 					</span>
 				</div>
 			</div>
-		<button type="button" class="btn btn-primary" id="submit">0</button>
+		<button type="button" class="btn btn-primary" id="submit">update</button>
+		<button type="button" class="btn btn-primary" id="submitOverride">Override</button>
 		</div>
 	</div>
 	<script src="./socket.io.js"></script>
@@ -62,6 +63,15 @@
 					arr.push(parseInt($('#xp').val()));
 					console.log(arr);
 					socket.emit('console',arr);
+				});
+				$("#submitOverride").click(function(){
+					var arr=[];
+					arr.push(parseInt($('#team').val()));
+					arr.push(parseInt($('#hp').val()));
+					arr.push(parseInt($('#mp').val()));
+					arr.push(parseInt($('#kp').val()));
+					arr.push(parseInt($('#xp').val()));
+					socket.emit('consoleOverride',arr);
 				});
 			});
 		})();

@@ -25,7 +25,8 @@ var status = [];
 for(var x = 0; x < 100; x++){
     status[x] = [];    
     for(var y = 0; y < 5; y++){ 
-        status[x][y] = 0;    
+        if(y==1 || y==2) status[x][y]=10;
+        else status[x][y] = 0;    
     }    
 }
 
@@ -48,19 +49,37 @@ for(var x = 0; x < 100; x++){
 io.on('connection', function(socket){
 	console.log('a user connected');
 	socket.on('console', function(data){
-		console.log(data);
+		//console.log(data);
 		var user= data[0];
-		if(data[1]<0) data[1]+=mod[user][0];
-		if(data[2]<0) data[2]+=mod[user][1];
-		if(data[3]>0) data[3]+=mod[user][2];
+		if(data[1]<0) data[1]+=mod[user][1];
+		if(data[2]<0) data[2]+=mod[user][2];
+		if(data[3]>0) data[3]+=mod[user][3];
 		status[user][0]++;
 		for(var x=1; x<5; x++){
 			status[user][x]+=data[x];
 		}
 		io.emit('update'+user,status[user]);
-		console.log('EMIT FINISH');
+		//console.log('EMIT FINISH');
 	});
-	console.log(1);
+	socket.on('consoleOverride', function(data){
+		var user=data[0];
+		for(var x=1;x<5;x++){
+			status[user][x]=data[x];
+		}
+	});
+	socket.on('sendStat',function(data){
+		var ind=data[0];
+		for(var x=1;x<4;x++){
+			stat[ind][x]=data[x];
+			if(data[x]>3 && data[x]<7) mod[ind][x]=1;
+			else if (data[x]>6 && data[x]<10) mod[ind][x]=2;
+			else if (data[x]==10) mod[ind][x]=3;
+			else mod[ind][x]=0;
+		}
+		//console.log(mod[ind]);
+	});
+
+	//console.log(1);
 
 });
 
