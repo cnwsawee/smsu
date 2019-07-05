@@ -3,23 +3,28 @@
 <head>
 	<meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
-<style type="text/css">
-	.progress{
-		position: absolute;left:50.5%;top:40%;width: 100%;height:50%;opacity: 0.8; filter: alpha(opacity=80);
-	}
-	.progress-bar{
-		position:absolute;top:30%; width: 100%;height: 70%;
-	}
-</style>
+    <link rel="stylesheet" href="./vendor/css/bootstrap.min.css">
+    <script src="./js/eventList.js"></script>
+    <script src="./vendor/js/socket.io.js"></script>
+	<script src="./vendor/js/jquery-3.4.1.min.js"></script>
+	<script type="text/javascript" src="./vendor/js/bootstrap.js"></script>
+	<style type="text/css">
+		.progress{
+			position: absolute;left:50.5%;top:40%;width: 100%;height:50%;opacity: 0.8; filter: alpha(opacity=80);
+		}
+		.progress-bar{
+			position:absolute;top:30%; width: 100%;height: 70%;
+		}
+	</style>
 </head>
 <body>	
-	<div class="container1">
+	<div class="container">
 		<div class="row">
 			<div class="col-md-4"> Player
 				<span class="form-group">
 					<input type="text" id="team">
 				</span>
+				<button type="button" class="btn btn-primary" id="submitEvent">Submit Event</button>
 			</div>
 			<div class="col-md-8"> 
 				<div class="row"> HP
@@ -46,13 +51,47 @@
 		<button type="button" class="btn btn-primary" id="submit">update</button>
 		<button type="button" class="btn btn-primary" id="submitOverride">Override</button>
 		</div>
+		<div class = "row">
+			<div class="col-md-4">
+				<ul class="list-group" id="listRegen"></ul>
+			</div>
+			<div class="col-md-4">
+				<ul class="list-group" id="listKnowledge"></ul>
+			</div>
+			<div class="col-md-4">
+				<ul class="list-group" id="listXp"></ul>
+			</div>
+		</div>
+		<div class = "row">
+			<button class ="btn btn-primary" id="eventButton"> Submit Event </button>
+		</div>
 	</div>
-	<script src="./socket.io.js"></script>
-	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
 	<script >
 		(function(){
 			
+			function arrayRemove(array,element){
+				for(var i=0;i<array.lenght;i++){
+					if(array[i]==element) break;
+				}
+				return array.splice(i,1);
+			}
 			var socket = io();
+			var eventRegen = getRegen();
+			var eventKnowledge = getKnowledge();
+			var eventXp = getXp();
+			eventRegen.forEach(function(element,index){
+				$("#listRegen").append("<li class=\"list-group-item\" id=\"eventRegen"+index+"\">"+element[0]);
+			});
+			eventKnowledge.forEach(function(element,index){
+				$("#listKnowledge").append("<li class=\"list-group-item\" id=\"eventKnowledge"+index+"\">"+element[0]);
+			});
+			eventXp.forEach(function(element,index){
+				$("#listXp").append("<li class=\"list-group-item\" id=\"eventXp"+index+"\">"+element[0]);
+			});
+			var listRegenActive =[];
+			var listKnowledgeActive =[];
+			var listXpActive =[];
+
 			$(document).ready(function(){
 				$("#submit").click(function(){
 					var arr=[];
@@ -73,6 +112,75 @@
 					arr.push(parseInt($('#xp').val()));
 					socket.emit('consoleOverride',arr);
 				});
+				$("#eventButton").click(function(){
+					listRegenActive = listRegenActive.sort();
+					socket.emit('listRegenActive',listRegenActive);
+					listKnowledgeActive = listKnowledgeActive.sort();
+					socket.emit('listKnowledgeActive',listKnowledgeActive);
+					listXpActive = listXpActive.sort();
+					socket.emit('listXpActive',listXpActive);
+				});
+				$("li[id*='eventRegen']").each(function(index){
+					$(this).click(function(){
+						if(!$(this).hasClass('active')){
+							$(this).addClass('active');
+							listRegenActive.push(index);
+							console.log(listRegenActive);
+						}
+						else if($(this).hasClass('active')){
+							$(this).removeClass('active');
+							//listRegenActive = arrayRemove(listRegenActive,index);
+							listRegenActive = listRegenActive.filter(function(item) { 
+   			 					return item !== index;
+							})
+							console.log(listRegenActive);
+
+						}
+
+					});
+				});
+				$("li[id*='eventKnowledge']").each(function(index){
+					$(this).click(function(){
+						if(!$(this).hasClass('active')){
+							$(this).addClass('active');
+							listKnowledgeActive.push(index);
+							console.log(listKnowledgeActive);
+						}
+						else if($(this).hasClass('active')){
+							$(this).removeClass('active');
+							//listKnowledgeActive = arrayRemove(listKnowledgeActive,index);
+							listKnowledgeActive = listKnowledgeActive.filter(function(item) { 
+   			 					return item !== index;
+							})
+							console.log(listKnowledgeActive);
+
+						}
+
+					});
+				});
+				$("li[id*='eventXp']").each(function(index){
+					$(this).click(function(){
+						if(!$(this).hasClass('active')){
+							$(this).addClass('active');
+							listXpActive.push(index);
+							console.log(listXpActive);
+						}
+						else if($(this).hasClass('active')){
+							$(this).removeClass('active');
+							//listXpActive = arrayRemove(listXpActive,index);
+							listXpActive = listXpActive.filter(function(item) { 
+   			 					return item !== index;
+							})
+							console.log(listXpActive);
+
+						}
+
+					});
+				});
+
+				$("#eventButton").click(function(){
+					socket.emit("eventSignal",1);
+				})
 			});
 		})();
 

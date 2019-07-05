@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="./vendor/css/bootstrap.min.css">
+    <script src="./vendor/js/socket.io.js"></script>
+	<script src="./vendor/js/jquery-3.4.1.min.js"></script>
+	<script type="text/javascript" src="./vendor/js/bootstrap.js"></script>
+	<script src="./js/jscolor.js"></script>
+</head>
+<body>	
+	<div class="container">
+		<div class="row"> 
+			Current User
+			<span id="totalUser" >1</span>
+		</div>
+		<br>
+		<div class="row">
+			<div class="col-md-6">
+				<span id="team0">1</span>
+			</div>
+			<div class="col-md-6"><input class="jscolor" value="ab2567" id="color0"></div>
+		</div>
+		<br>
+		<div class="row">
+			<div class="col-md-6">
+				<span id="team1">1</span>
+			</div>
+			<div class="col-md-6"><input class="jscolor" value="ab2567" id="color1"></div>
+		</div>
+		<br>
+		<div class="row">
+			<div class="col-md-6">
+				<span id="team2">1</span>
+			</div>
+			<div class="col-md-6"><input class="jscolor" value="ab2567" id="color2"></div>
+		</div>
+		<br>
+		<div class="row">
+			<div class="col-md-6">
+				<span id="team3">1</span>
+			</div>
+			<div class="col-md-6"><input class="jscolor" value="ab2567" id="color3"></div>
+		</div>
+		<br>
+		<div class="row">
+			<button class="btn btn-primary" id="requestUser">Request User</button>
+			<br>
+			<button class="btn btn-primary" id="randomUser">Random User</button>
+			<br>
+			<button class="btn btn-primary" id="submitColor">Submit Color</button>
+		</div>
+	</div>
+	<script>
+		(function(){
+			$(document).ready(function(){
+				var socket =io();
+				var currentUser = [];
+				currentUser = [1,2,3,4,5,6,7,8,9,10,11,12,13];
+				var team=[];
+				team[0]=[];
+				team[1]=[];
+				team[2]=[];
+				team[3]=[];
+
+				$("#requestUser").click(function(){
+					socket.emit("requestUser",1);
+				});
+
+				socket.on("currentUser",function(data){
+					currentUser=data;
+					$("#totalUser").val(data);
+				});
+
+				$("#randomUser").click(function(){
+					for(var x=0;x<4;x++){
+						team[x]=[];
+					};
+					for(var x=0;x<currentUser.length;x++){
+						var tmp=[];
+						for(y=0;y<4 && x<currentUser.length;y++,x++){
+							var rand;
+							while(true){
+								rand=Math.floor(Math.random()*4);
+								if(tmp.includes(rand)==0){
+									break;
+								}
+							}
+							tmp.push(rand);
+							team[rand].push(currentUser[x]);
+						};
+					};
+					console.log(team[0]);
+					for(var x=0;x<4;x++){
+						console.log(team[x]);
+						$("#team"+x).text(team[x]);
+					};
+				});
+
+				$("#submitColor").click(function(){
+					var sendData =[];
+					currentUser.forEach(function(element,index){
+						sendData[element]=0;
+						for(var x=0;x<4;x++){
+							if(team[x].includes(element)){
+								sendData[element]=$("#color"+x).val();
+							}
+						}
+						
+					})
+					socket.emit("changeColor",sendData);
+				});
+
+			});
+		})();
+	</script>
+</body>

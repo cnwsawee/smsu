@@ -2,7 +2,13 @@ var express = require('express');
 var app = express();
 app.use(express.static(__dirname + '/public'));
 var http = require('http').createServer(app);
+
+
 var io = require('socket.io')(http);
+var eventList = require('./public/js/eventList');
+var eventListRegen = eventList.getRegen();
+var eventListKnowledge = eventList.getKnowledge();
+var eventListXp = eventList.getXp();
 
 app.set('port',8080);
 app.set('ip', '0.0.0.0');
@@ -19,6 +25,9 @@ app.get('/console', function (req, res, next){
 });
 app.get('/control', function (req, res, next){
 	res.sendFile(__dirname + '/control.html');
+});
+app.get('/color', function (req, res, next){
+	res.sendFile(__dirname + '/color.html');
 });
 
 var status = [];
@@ -45,22 +54,50 @@ for(var x = 0; x < 100; x++){
         mod[x][y] = 0;    
     }    
 }
+var currentUser =[];
 
 io.on('connection', function(socket){
 	console.log('a user connected');
-	socket.on('console', function(data){
-		//console.log(data);
-		var user= data[0];
-		if(data[1]<0) data[1]+=mod[user][1];
-		if(data[2]<0) data[2]+=mod[user][2];
-		if(data[3]>0) data[3]+=mod[user][3];
-		status[user][0]++;
-		for(var x=1; x<5; x++){
-			status[user][x]+=data[x];
+	socket.on('start',function(data){
+		if(stat[data][0]==0) {
+			io.emit('statSubmission'+data,0);
 		}
-		io.emit('update'+user,status[user]);
+		io.emit('updateScore'+data,status[data]);
+		currentUser.push(data);
+	});
+	socket.on('sendEvent', function(data){
+		var username= data[0];
+		var scoreChange =[];
+		if(data[1] == 0) scoreChange = eventListRegen[data[2]];
+		else if(data[1] == 1) scoreChange = eventListKnowledge[data[2]];
+		else if(data[1] == 2) scoreChange = eventListXp[data[2]];
+		console.log(scoreChange);
+
+		if(scoreChange[1]<0) scoreChange[1]+=mod[username][1];
+		if(scoreChange[2]<0) scoreChange[2]+=mod[username][2];
+		if(scoreChange[3]>0) scoreChange[3]+=mod[username][3];
+		status[username][0]++;
+
+		for(var x=1; x<5; x++){
+			status[username][x]+=scoreChange[x];
+		}
+		io.emit('updateScore'+username,status[username]);
 		//console.log('EMIT FINISH');
 	});
+	socket.on('examScore', function(data){
+		for(var x=0;x<100;x++){
+			status[x][3]=Math.ceil((score[x][3]-10)/2);
+		}
+		for(var x=0;x<100;x++){
+			io.emit("updateScore"+x,status[x]);
+		}
+	});
+	socket.on('console',function(data){
+		var user=data[0];
+		for(var x=1;x<5;x++){
+			status[user][x]+=data[x];
+		}
+	})
 	socket.on('consoleOverride', function(data){
 		var user=data[0];
 		for(var x=1;x<5;x++){
@@ -71,16 +108,32 @@ io.on('connection', function(socket){
 		var ind=data[0];
 		for(var x=1;x<4;x++){
 			stat[ind][x]=data[x];
+			stat[ind][0]=1;
 			if(data[x]>3 && data[x]<7) mod[ind][x]=1;
 			else if (data[x]>6 && data[x]<10) mod[ind][x]=2;
 			else if (data[x]==10) mod[ind][x]=3;
 			else mod[ind][x]=0;
 		}
-		//console.log(mod[ind]);
 	});
-
-	//console.log(1);
-
+	socket.on('listRegenActive',function(data){
+		io.emit('eventRegen',data);
+	});
+	socket.on('listKnowledgeActive',function(data){
+		io.emit('eventKnowledge',data);
+	});
+	socket.on('listXpActive',function(data){
+		io.emit('eventXp',data);
+	});
+	socket.on('changeColor',function(data){
+		console.log(1231231);
+		data.forEach(function(element,index){
+			if(element!=0)
+				io.emit("changeColor"+index ,element);
+		});
+	});
+	socket.on('eventSignal',function(data){
+		io.emit('requestEvent',1);
+	})
 });
 
 http.listen(8080, function(){
