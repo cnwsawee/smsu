@@ -79,22 +79,24 @@ io.on('connection', function(socket){
 	});
 	socket.on('sendEvent', function(data){
 		var username= data[0];
-		var scoreChange =[];
-		if(data[1] == 0) scoreChange = eventListRegen[data[2]];
-		else if(data[1] == 1) scoreChange = eventListKnowledge[data[2]];
-		else if(data[1] == 2) scoreChange = eventListXp[data[2]];
-		console.log(scoreChange);
-
-		if(scoreChange[1]<0) scoreChange[1]+=mod[username][1];
-		if(scoreChange[2]<0) scoreChange[2]+=mod[username][2];
-		if(scoreChange[3]>0) scoreChange[3]+=mod[username][3];
-		status[username][0]++;
-
-		for(var x=1; x<5; x++){
-			status[username][x]+=scoreChange[x];
-			if(status[username][x]<0) status[username][x]=0;
-		}
-		io.emit('updateScore'+username,status[username]);
+			var scoreChange =[];
+		if(username>=0&&<100){
+					if(data[1] == 0) scoreChange = eventListRegen[data[2]];
+					else if(data[1] == 1) scoreChange = eventListKnowledge[data[2]];
+					else if(data[1] == 2) scoreChange = eventListXp[data[2]];
+					console.log(scoreChange);
+		
+					if(scoreChange[1]<0) scoreChange[1]+=mod[username][1];
+					if(scoreChange[2]<0) scoreChange[2]+=mod[username][2];
+					if(scoreChange[3]>0) scoreChange[3]+=mod[username][3];
+					status[username][0]++;
+		
+					for(var x=1; x<5; x++){
+						status[username][x]+=scoreChange[x];
+						if(status[username][x]<0) status[username][x]=0;
+					}
+					io.emit('updateScore'+username,status[username]);
+				}
 		//console.log('EMIT FINISH');
 	});
 	socket.on('examSignal', function(data){
