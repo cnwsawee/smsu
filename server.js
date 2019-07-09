@@ -80,7 +80,7 @@ io.on('connection', function(socket){
 	socket.on('sendEvent', function(data){
 		var username= data[0];
 			var scoreChange =[];
-		if(username>=0&&<100){
+		if(username>0&&username<100){
 					if(data[1] == 0) scoreChange = eventListRegen[data[2]];
 					else if(data[1] == 1) scoreChange = eventListKnowledge[data[2]];
 					else if(data[1] == 2) scoreChange = eventListXp[data[2]];
