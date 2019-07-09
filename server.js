@@ -66,14 +66,16 @@ var currentUser =[];
 io.on('connection', function(socket){
 	console.log('a user connected');
 	socket.on('start',function(data){
-		if(stat[data][0]==0) {
-			io.emit('statSubmission'+data,0);
+		if(data!=0){
+			if(stat[data][0]==0) {
+				io.emit('statSubmission'+data,0);
+			}
+			io.emit('updateScore'+data,status[data]);
+			io.emit('eventRegen',listRegenActive);
+			io.emit('eventKnowledge',listKnowledgeActive);
+			io.emit('eventXp',listXpActive);
+			currentUser.push(data);
 		}
-		io.emit('updateScore'+data,status[data]);
-		io.emit('eventRegen',listRegenActive);
-		io.emit('eventKnowledge',listKnowledgeActive);
-		io.emit('eventXp',listXpActive);
-		currentUser.push(data);
 	});
 	socket.on('sendEvent', function(data){
 		var username= data[0];
