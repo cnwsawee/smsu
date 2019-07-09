@@ -25,6 +25,8 @@
 					<input type="text" id="team">
 				</span>
 				<button type="button" class="btn btn-primary" id="submitEvent">Submit Event</button>
+				<br>
+				<button type="button" class="btn btn-primary" id="submitExam">Exam Score Update</button>
 			</div>
 			<div class="col-md-8"> 
 				<div class="row"> HP
@@ -120,6 +122,10 @@
 					listXpActive = listXpActive.sort();
 					socket.emit('listXpActive',listXpActive);
 				});
+				$("#submitExam").click(function(){
+					io.emit('examSignal',1);
+				});
+				
 				$("li[id*='eventRegen']").each(function(index){
 					$(this).click(function(){
 						if(!$(this).hasClass('active')){
@@ -178,7 +184,7 @@
 					});
 				});
 
-				$("#eventButton").click(function(){
+				$("#submitEvent").click(function(){
 					socket.emit("eventSignal",1);
 				})
 			});

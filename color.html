@@ -11,6 +11,16 @@
 </head>
 <body>	
 	<div class="container">
+		<div class="row">
+			<div class="col-md-3">
+				<input type="number" class="form-control" id="playerNumber">
+			</div>
+			<div class="col-md-3">
+				<button class="btn btn-primary" id="playerButton">Submit Player Number</button>
+			</div>
+		</div>
+	</div>
+	<div class="container" id="groupContainer">
 		<div class="row"> 
 			Current User
 			<span id="totalUser" >1</span>
@@ -43,6 +53,8 @@
 			</div>
 			<div class="col-md-6"><input class="jscolor" value="ab2567" id="color3"></div>
 		</div>
+	</div>
+	<div class="container" id="buttonContainer">
 		<br>
 		<div class="row">
 			<button class="btn btn-primary" id="requestUser">Request User</button>
@@ -50,6 +62,8 @@
 			<button class="btn btn-primary" id="randomUser">Random User</button>
 			<br>
 			<button class="btn btn-primary" id="submitColor">Submit Color</button>
+			<br>
+			<button class="btn btn-primary" id="resetColor">Reset</button>
 		</div>
 	</div>
 	<script>
@@ -59,10 +73,10 @@
 				var currentUser = [];
 				currentUser = [1,2,3,4,5,6,7,8,9,10,11,12,13];
 				var team=[];
-				team[0]=[];
-				team[1]=[];
-				team[2]=[];
-				team[3]=[];
+				for(var x=0;x<10;x++){
+					team[x]=[];
+				}
+				var currentNumber=4;
 
 				$("#requestUser").click(function(){
 					socket.emit("requestUser",1);
@@ -73,16 +87,27 @@
 					$("#totalUser").val(data);
 				});
 
+				$("#playerButton").click(function(){
+					var number=$("#playerNumber").val();
+					currentNumber = number;
+					$("#groupContainer").empty();
+					for(var x=0;x<currentNumber;x++){
+						$("#groupContainer").append("<div class=\"row\"><div class=\"col-md-6\"><span id=\"team"+x+"\">1</span></div><div class=\"col-md-6\"><input class=\"jscolor\" value=\"AB2567\" id=\"color"+x+"\"></div></div><br>");
+					}
+					init();
+
+
+				});
 				$("#randomUser").click(function(){
 					for(var x=0;x<4;x++){
 						team[x]=[];
 					};
 					for(var x=0;x<currentUser.length;x++){
 						var tmp=[];
-						for(y=0;y<4 && x<currentUser.length;y++,x++){
+						for(y=0;y<currentNumber && x<currentUser.length;y++,x++){
 							var rand;
 							while(true){
-								rand=Math.floor(Math.random()*4);
+								rand=Math.floor(Math.random()*currentNumber);
 								if(tmp.includes(rand)==0){
 									break;
 								}
@@ -92,7 +117,7 @@
 						};
 					};
 					console.log(team[0]);
-					for(var x=0;x<4;x++){
+					for(var x=0;x<currentNumber;x++){
 						console.log(team[x]);
 						$("#team"+x).text(team[x]);
 					};
@@ -102,7 +127,7 @@
 					var sendData =[];
 					currentUser.forEach(function(element,index){
 						sendData[element]=0;
-						for(var x=0;x<4;x++){
+						for(var x=0;x<currentNumber;x++){
 							if(team[x].includes(element)){
 								sendData[element]=$("#color"+x).val();
 							}
@@ -112,6 +137,18 @@
 					socket.emit("changeColor",sendData);
 				});
 
+				$("#resetColor").click(function(){
+					var sendData=[];
+					currentUser.forEach(function(element,index){
+						sendData[element]=0;
+						for(var x=0;x<currentNumber;x++){
+							if(team[x].includes(element)){
+								sendData[element]="FFFFFF";
+							}
+						}
+					})
+					socket.emit("changeColor",sendData);
+				});
 			});
 		})();
 	</script>

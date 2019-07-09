@@ -10,10 +10,13 @@
 	<script type="text/javascript" src="./vendor/js/bootstrap.js"></script>
 	<style type="text/css">
 		.progress{
-			height:70vh;
+			height:50vh;
 		}
 		.progress-bar{
 			position:relative;top:0%; width: 100%;height: 100%;
+			-webkit-transition: width 2.5s ease;
+    		transition: width 2.5s ease;
+	}
 		}
 		body {
    			padding-left: 10px;
@@ -21,6 +24,22 @@
 		.statusNumber{
 			font-size: 30pt;
 			text-align: center;
+		}
+		.col-sm-4{
+			padding-left: 2px;
+			padding-right: 2px;
+			width: 33%;
+		}
+		.col-sm-2{
+			width: 20%;
+		}
+		.col-sm-1{
+			padding-left: 2px;
+			width: 2%;
+		}
+		.liEvent{
+			text-align: center;
+			font-size: 10pt;
 		}
 	</style>
 </head>
@@ -62,13 +81,13 @@
   			</div>
 		</div>
 		<div class="row">
-			<div class="col-md-4">
+			<div class="col-md-4 col-sm-4">
 				<ul class="list-group" id="listRegen"></ul>
 			</div>
-			<div class="col-md-4">
+			<div class="col-md-4 col-sm-4">
 				<ul class="list-group" id="listKnowledge"></ul>
 			</div>
-			<div class="col-md-4">
+			<div class="col-md-4 col-sm-4">
 				<ul class="list-group" id="listXp"></ul>
 			</div>
 		</div>
@@ -131,14 +150,84 @@
 			var eventRegen = getRegen();
 			var eventKnowledge = getKnowledge();
 			var eventXp = getXp();
-			var activeEvent =[];
+			var activeEvent =[username,3,0];
 			var upd = function(name, val){
-				$('#'+name).css('height',(val*5)+'%').attr('aria-valuenow'+(val*5));
-				$('#'+name).css('top',100-(val*5)+'%')
+				//$('#'+name).css('height',(val*5)+'%');
+				$('#'+name).animate({
+					top: 100-(val*5) +'%',
+					height: val*5 +'%'
+				},1000);	
+				$('#'+name).attr('aria-valuenow'+(val*5));
+				//$('#'+name).css('top',100-(val*5)+'%')
 				//$("#"+name).text(val);
 				$("#"+name+'1').text(val);
 			}
-			
+			var progressColor = function(name, val){
+				if(val <5){
+					if($('#'+name).hasClass('bg-warning')){
+						$('#'+name).removeClass('bg-warning');
+					}
+					if($('#'+name).hasClass('bg-danger')){
+						$('#'+name).removeClass('bg-danger');
+					}
+					$('#'+name).addClass('bg-danger');
+				}
+				else if(val >=5 && val <10){
+					if($('#'+name).hasClass('bg-warning')){
+						$('#'+name).removeClass('bg-warning');
+					}
+					if($('#'+name).hasClass('bg-danger')){
+						$('#'+name).removeClass('bg-danger');
+					}
+					$('#'+name).addClass('bg-warning');	
+				}
+				else{
+					if($('#'+name).hasClass('bg-warning')){
+						$('#'+name).removeClass('bg-warning');
+					}
+					if($('#'+name).hasClass('bg-danger')){
+						$('#'+name).removeClass('bg-danger');
+					}
+				}
+			}
+			var progressColorKn = function(name, val){
+				if(val <5){
+					if($('#'+name).hasClass('bg-warning')){
+						$('#'+name).removeClass('bg-warning');
+					}
+					if($('#'+name).hasClass('bg-danger')){
+						$('#'+name).removeClass('bg-danger');
+					}
+					if($('#'+name).hasClass('bg-success')){
+						$('#'+name).removeClass('bg-success');
+					}
+					$('#'+name).addClass('bg-danger');
+				}
+				else if(val >=5 && val <10){
+					if($('#'+name).hasClass('bg-warning')){
+						$('#'+name).removeClass('bg-warning');
+					}
+					if($('#'+name).hasClass('bg-danger')){
+						$('#'+name).removeClass('bg-danger');
+					}
+					if($('#'+name).hasClass('bg-success')){
+						$('#'+name).removeClass('bg-success');
+					}
+					$('#'+name).addClass('bg-warning');	
+				}
+				else if(val >=10 && val<15){
+					if($('#'+name).hasClass('bg-warning')){
+						$('#'+name).removeClass('bg-warning');
+					}
+					if($('#'+name).hasClass('bg-danger')){
+						$('#'+name).removeClass('bg-danger');
+					}
+					if($('#'+name).hasClass('bg-success')){
+						$('#'+name).removeClass('bg-success');
+					}
+					$('#'+name).addClass('bg-success');
+				}
+			}
 			$(document).ready(function(){
 				if(socket !== undefined){
 					console.log('Connected');
@@ -153,7 +242,7 @@
 					eventPoolRegen = data;
 					$("#listRegen").empty();
 					eventPoolRegen.forEach(function(element,index){
-						$("#listRegen").append("<li class=\"list-group-item\" id=\"eventRegen"+element+"\">"+eventRegen[element][0]);
+						$("#listRegen").append("<li class=\"list-group-item liRegen liEvent\" id=\"eventRegen"+element+"\">"+eventRegen[element][0]);
 						//$("#eventRegen"+element).unbind('click');
 						$("#eventRegen"+element).click(function(){
 							$("li[id*='event']").each(function(){
@@ -168,7 +257,7 @@
 					eventPoolKnowledge = data;
 					$("#listKnowledge").empty();
 					eventPoolKnowledge.forEach(function(element,index){
-						$("#listKnowledge").append("<li class=\"list-group-item\" id=\"eventKnowledge"+element+"\">"+eventKnowledge[element][0]);
+						$("#listKnowledge").append("<li class=\"list-group-item liKnowledge liEvent\" id=\"eventKnowledge"+element+"\">"+eventKnowledge[element][0]);
 						//$("#eventKnowledge"+element).unbind('click');
 						$("#eventKnowledge"+element).click(function(){
 							$("li[id*='event']").each(function(){
@@ -183,7 +272,7 @@
 					eventPoolXp = data;
 					$("#listXp").empty();
 					eventPoolXp.forEach(function(element,index){
-						$("#listXp").append("<li class=\"list-group-item\" id=\"eventXp"+element+"\">"+eventXp[element][0]);
+						$("#listXp").append("<li class=\"list-group-item liXp liEvent\" id=\"eventXp"+element+"\">"+eventXp[element][0]);
 						//$("#eventXp"+element).unbind('click');
 						$("#eventXp"+element).click(function(){
 							$("li[id*='event']").each(function(){
@@ -197,9 +286,14 @@
 
 				socket.on('updateScore'+ username, function(data){
 					upd('hp',data[1]);
+					progressColor('hp',data[1]);
 					upd('mp',data[2]);
+					progressColor('mp',data[2]);
 					upd('kp',data[3]);
+					progressColorKn('kp',data[3]);
 					upd('xp',data[4]);
+					progressColorKn('xp',data[4]);
+
 				});
 
 				socket.on('changeColor'+ username, function(data){
@@ -223,7 +317,11 @@
 				});
 
 				socket.on('requestEvent',function(data){
-					io.emit('sendEvent',activeEvent);
+					socket.emit('sendEvent',activeEvent);
+					$("li[id*='event']").each(function(){
+						$(this).removeClass('active');
+					})
+					activeEvent=[username,3,0];
 				})
 
 				$("#submitEvent").click(function(){

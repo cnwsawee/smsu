@@ -9,6 +9,9 @@ var eventList = require('./public/js/eventList');
 var eventListRegen = eventList.getRegen();
 var eventListKnowledge = eventList.getKnowledge();
 var eventListXp = eventList.getXp();
+var listRegenActive =[];
+var listKnowledgeActive =[];
+var listXpActive =[];
 
 app.set('port',8080);
 app.set('ip', '0.0.0.0');
@@ -28,6 +31,9 @@ app.get('/control', function (req, res, next){
 });
 app.get('/color', function (req, res, next){
 	res.sendFile(__dirname + '/color.html');
+});
+app.get('/dashboard', function (req, res, next){
+	res.sendFile(__dirname + '/dashboard.html');
 });
 
 var status = [];
@@ -54,6 +60,7 @@ for(var x = 0; x < 100; x++){
         mod[x][y] = 0;    
     }    
 }
+var selectedEvent =[];
 var currentUser =[];
 
 io.on('connection', function(socket){
@@ -63,6 +70,9 @@ io.on('connection', function(socket){
 			io.emit('statSubmission'+data,0);
 		}
 		io.emit('updateScore'+data,status[data]);
+		io.emit('eventRegen',listRegenActive);
+		io.emit('eventKnowledge',listKnowledgeActive);
+		io.emit('eventXp',listXpActive);
 		currentUser.push(data);
 	});
 	socket.on('sendEvent', function(data){
@@ -84,7 +94,7 @@ io.on('connection', function(socket){
 		io.emit('updateScore'+username,status[username]);
 		//console.log('EMIT FINISH');
 	});
-	socket.on('examScore', function(data){
+	socket.on('examSignal', function(data){
 		for(var x=0;x<100;x++){
 			status[x][3]=Math.ceil((score[x][3]-10)/2);
 		}
@@ -116,12 +126,15 @@ io.on('connection', function(socket){
 		}
 	});
 	socket.on('listRegenActive',function(data){
+		listRegenActive=data;
 		io.emit('eventRegen',data);
 	});
 	socket.on('listKnowledgeActive',function(data){
+		listKnowledgeActive=data;
 		io.emit('eventKnowledge',data);
 	});
 	socket.on('listXpActive',function(data){
+		listXpActive=data;
 		io.emit('eventXp',data);
 	});
 	socket.on('changeColor',function(data){
