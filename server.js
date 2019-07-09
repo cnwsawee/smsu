@@ -82,9 +82,12 @@ io.on('connection', function(socket){
 		var scoreChange =[0,0,0,0];
 		if(username>0&&username<100){
 					console.log(username,scoreChange,0);
-					if(data[1] == 0) scoreChange = eventListRegen[data[2]];
-					else if(data[1] == 1) scoreChange = eventListKnowledge[data[2]];
-					else if(data[1] == 2) scoreChange = eventListXp[data[2]];
+					//if(data[1] == 0) scoreChange = eventListRegen[data[2]];
+					//else if(data[1] == 1) scoreChange = eventListKnowledge[data[2]];
+					//else if(data[1] == 2) scoreChange = eventListXp[data[2]];
+
+					if(data[1] == 1) {scoreChange = eventListKnowledge[data[2]];
+					}
 					console.log(username,scoreChange,1);
 		
 					if(scoreChange[1]<0) scoreChange[1]+=mod[username][1];
