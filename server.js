@@ -127,7 +127,7 @@ io.on('connection', function(socket){
 			if(data[x]>3 && data[x]<7) mod[ind][x]=1;
 			else if (data[x]>6 && data[x]<10) mod[ind][x]=2;
 			else if (data[x]==10) mod[ind][x]=3;
-			else mod[ind][x]=0;
+			else if (data[x]<=3) mod[ind][x]=0;
 		}
 	});
 	socket.on('listRegenActive',function(data){
