@@ -92,6 +92,7 @@ io.on('connection', function(socket){
 
 		for(var x=1; x<5; x++){
 			status[username][x]+=scoreChange[x];
+			if(status[username][x]<0) status[username][x]=0;
 		}
 		io.emit('updateScore'+username,status[username]);
 		//console.log('EMIT FINISH');
