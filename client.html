@@ -228,108 +228,109 @@
 					$('#'+name).addClass('bg-success');
 				}
 			}
-			$(document).ready(function(){
-				if(socket !== undefined){
-					console.log('Connected');
-				};
-				socket.emit('start',username);
-				socket.on('statSubmission'+username,function(data){
-					if(data == 0){
-						$('#statModal').modal("show");
-					}
-				});
-				socket.on('eventRegen',function(data){
-					eventPoolRegen = data;
-					$("#listRegen").empty();
-					eventPoolRegen.forEach(function(element,index){
-						$("#listRegen").append("<li class=\"list-group-item liRegen liEvent\" id=\"eventRegen"+element+"\">"+eventRegen[element][0]);
-						//$("#eventRegen"+element).unbind('click');
-						$("#eventRegen"+element).click(function(){
-							$("li[id*='event']").each(function(){
-								$(this).removeClass('active');
+			if(username!=0){
+						$(document).ready(function(){
+							if(socket !== undefined){
+								console.log('Connected');
+							};
+							socket.emit('start',username);
+							socket.on('statSubmission'+username,function(data){
+								if(data == 0){
+									$('#statModal').modal("show");
+								}
+							});
+							socket.on('eventRegen',function(data){
+								eventPoolRegen = data;
+								$("#listRegen").empty();
+								eventPoolRegen.forEach(function(element,index){
+									$("#listRegen").append("<li class=\"list-group-item liRegen liEvent\" id=\"eventRegen"+element+"\">"+eventRegen[element][0]);
+									//$("#eventRegen"+element).unbind('click');
+									$("#eventRegen"+element).click(function(){
+										$("li[id*='event']").each(function(){
+											$(this).removeClass('active');
+										})
+										$(this).addClass('active');
+										activeEvent =[username,0,element];
+									});
+								});
+							});
+							socket.on('eventKnowledge',function(data){
+								eventPoolKnowledge = data;
+								$("#listKnowledge").empty();
+								eventPoolKnowledge.forEach(function(element,index){
+									$("#listKnowledge").append("<li class=\"list-group-item liKnowledge liEvent\" id=\"eventKnowledge"+element+"\">"+eventKnowledge[element][0]);
+									//$("#eventKnowledge"+element).unbind('click');
+									$("#eventKnowledge"+element).click(function(){
+										$("li[id*='event']").each(function(){
+											$(this).removeClass('active');
+										})
+										$(this).addClass('active');
+										activeEvent =[username,1,element];
+									});	
+								})
+							});
+							socket.on('eventXp',function(data){
+								eventPoolXp = data;
+								$("#listXp").empty();
+								eventPoolXp.forEach(function(element,index){
+									$("#listXp").append("<li class=\"list-group-item liXp liEvent\" id=\"eventXp"+element+"\">"+eventXp[element][0]);
+									//$("#eventXp"+element).unbind('click');
+									$("#eventXp"+element).click(function(){
+										$("li[id*='event']").each(function(){
+											$(this).removeClass('active');
+										})
+										$(this).addClass('active');
+										activeEvent =[username,2,element];
+									});
+								})
+							});
+			
+							socket.on('updateScore'+ username, function(data){
+								upd('hp',data[1]);
+								progressColor('hp',data[1]);
+								upd('mp',data[2]);
+								progressColor('mp',data[2]);
+								upd('kp',data[3]);
+								progressColorKn('kp',data[3]);
+								upd('xp',data[4]);
+								progressColorKn('xp',data[4]);
+			
+							});
+			
+							socket.on('changeColor'+ username, function(data){
+								console.log(data);
+								$("body").css("background-color","#"+data);
+								
+							});
+							/*
+							socket.on('submit', function(data){
+			
+							});
+							*/
+							$("#submitStat").click(function(){
+								var arr=[];
+								arr.push(parseInt(username));
+								arr.push(parseInt($('#phy').val()));
+								arr.push(parseInt($('#res').val()));
+								arr.push(parseInt($('#int').val()));
+								socket.emit("sendStat",arr);
+								$('#statModal').modal("hide");
+							});
+			
+							socket.on('requestEvent',function(data){
+								socket.emit('sendEvent',activeEvent);
+								$("li[id*='event']").each(function(){
+									$(this).removeClass('active');
+								})
+								activeEvent=[username,3,0];
 							})
-							$(this).addClass('active');
-							activeEvent =[username,0,element];
-						});
-					});
-				});
-				socket.on('eventKnowledge',function(data){
-					eventPoolKnowledge = data;
-					$("#listKnowledge").empty();
-					eventPoolKnowledge.forEach(function(element,index){
-						$("#listKnowledge").append("<li class=\"list-group-item liKnowledge liEvent\" id=\"eventKnowledge"+element+"\">"+eventKnowledge[element][0]);
-						//$("#eventKnowledge"+element).unbind('click');
-						$("#eventKnowledge"+element).click(function(){
-							$("li[id*='event']").each(function(){
-								$(this).removeClass('active');
-							})
-							$(this).addClass('active');
-							activeEvent =[username,1,element];
-						});	
-					})
-				});
-				socket.on('eventXp',function(data){
-					eventPoolXp = data;
-					$("#listXp").empty();
-					eventPoolXp.forEach(function(element,index){
-						$("#listXp").append("<li class=\"list-group-item liXp liEvent\" id=\"eventXp"+element+"\">"+eventXp[element][0]);
-						//$("#eventXp"+element).unbind('click');
-						$("#eventXp"+element).click(function(){
-							$("li[id*='event']").each(function(){
-								$(this).removeClass('active');
-							})
-							$(this).addClass('active');
-							activeEvent =[username,2,element];
-						});
-					})
-				});
-
-				socket.on('updateScore'+ username, function(data){
-					upd('hp',data[1]);
-					progressColor('hp',data[1]);
-					upd('mp',data[2]);
-					progressColor('mp',data[2]);
-					upd('kp',data[3]);
-					progressColorKn('kp',data[3]);
-					upd('xp',data[4]);
-					progressColorKn('xp',data[4]);
-
-				});
-
-				socket.on('changeColor'+ username, function(data){
-					console.log(data);
-					$("body").css("background-color","#"+data);
-					
-				});
-				/*
-				socket.on('submit', function(data){
-
-				});
-				*/
-				$("#submitStat").click(function(){
-					var arr=[];
-					arr.push(parseInt(username));
-					arr.push(parseInt($('#phy').val()));
-					arr.push(parseInt($('#res').val()));
-					arr.push(parseInt($('#int').val()));
-					socket.emit("sendStat",arr);
-					$('#statModal').modal("hide");
-				});
-
-				socket.on('requestEvent',function(data){
-					socket.emit('sendEvent',activeEvent);
-					$("li[id*='event']").each(function(){
-						$(this).removeClass('active');
-					})
-					activeEvent=[username,3,0];
-				})
-
-				$("#submitEvent").click(function(){
-					console.log(activeEvent);
-					socket.emit('sendEvent',activeEvent);
-				});
-
-			});
+			
+							$("#submitEvent").click(function(){
+								console.log(activeEvent);
+								socket.emit('sendEvent',activeEvent);
+							});
+			
+						});}
 		})();	
 	</script>
 </body>
