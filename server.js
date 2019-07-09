@@ -81,6 +81,7 @@ io.on('connection', function(socket){
 		var username= data[0];
 		var scoreChange =[0,0,0,0];
 		if(username>0&&username<100){
+					console.log(username,scoreChange,0);
 					if(data[1] == 0) scoreChange = eventListRegen[data[2]];
 					else if(data[1] == 1) scoreChange = eventListKnowledge[data[2]];
 					else if(data[1] == 2) scoreChange = eventListXp[data[2]];
