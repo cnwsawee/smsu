@@ -4,6 +4,7 @@
 	<meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<script src="./js/eventList.js"></script>
+	<script src="./js/client.js"></script>
 	<link rel="stylesheet" href="./vendor/css/bootstrap.min.css">
 	<script src="./vendor/js/socket.io.js"></script>
 	<script src="./vendor/js/jquery-3.4.1.min.js"></script>
@@ -41,6 +42,10 @@
 			text-align: center;
 			font-size: 10pt;
 		}
+		.statusLabel{
+			text-align: center;
+			font-size: 20pt;
+		}
 	</style>
 </head>
 <body>	
@@ -49,29 +54,44 @@
   			<div class="modal-dialog" role="document">
     			<div class="modal-content">
       				<div class="modal-header">
-        				<h5 class="modal-title">Modal title</h5>
+        				<h5 class="modal-title">Stat Registration</h5>
         					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
           						<span aria-hidden="true">&times;</span>
         				</button>
       				</div>
       				<div class="modal-body">
         				<div class="row">
-					Phy
+					Endurance
 					<span class="form-group">
-						<input type="text" id="phy">
+						<button class="btn btn-primary btnStat" id="btnMinus0"> - </button>
+						<span type="text" id="phy"> 0 </span>
+						<button class="btn btn-primary btnStat" id="btnPlus0"> + </button>
 					</span>
 				</div>
 				<div class="row">
-					Res
+					Resilience
 					<span class="form-group">
-						<input type="text" id="res">
+						<button class="btn btn-primary btnStat" id="btnMinus1"> - </button>
+						<span type="text" id="res"> 0 </span>
+						<button class="btn btn-primary btnStat" id="btnPlus1"> + </button>
 					</span>
 				</div>
 				<div class="row">
-					Int
+					Intelligence
 					<span class="form-group">
-						<input type="text" id="int">
+						<button class="btn btn-primary btnStat" id="btnMinus2"> - </button>
+						<span type="text" id="int"> 0 </span>
+						<button class="btn btn-primary btnStat" id="btnPlus2"> + </button>
+						
 					</span>
+				</div>
+				<div class="row">
+					<div class="col-md-6">
+						Score Left
+					</div>
+					<div class="col-md-6">
+						<span type="number" id="scoreLeft"> 10 </span>
+					</div>
 				</div>
       				</div>
       				<div class="modal-footer">
@@ -80,7 +100,7 @@
     			</div>
   			</div>
 		</div>
-		<div class="row">
+		<div class="row" id="eventSelector">
 			<div class="col-md-4 col-sm-4">
 				<ul class="list-group" id="listRegen"></ul>
 			</div>
@@ -100,6 +120,7 @@
 			<br>
 			<br>
 			<div class="col-md-2 col-sm-2">
+				<span class="statusLabel">HP</span>
 				<div class="progress">
 						    		<div class="progress-bar bg-primary" role="progressbar" style="" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" id= "hp">
 						    	</div>
@@ -110,6 +131,7 @@
 				
 			</div>
 			<div class="col-md-2 col-sm-2">
+				<span class="statusLabel">MP</span>
 				<div class="progress">
 						    		<div class="progress-bar bg-primary" role="progressbar" style="" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" id= "mp">
 						    	</div>
@@ -120,6 +142,7 @@
 				
 			</div>
 			<div class="col-md-2 col-sm-2">
+				<span class="statusLabel">KP</span>
 				<div class="progress">
 						    		<div class="progress-bar bg-primary" role="progressbar" style="" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id= "kp">
 						    	</div>
@@ -130,6 +153,7 @@
 				
 			</div>
 			<div class="col-md-2 col-sm-2">
+				<span class="statusLabel">XP</span>
 				<div class="progress">
 						    		<div class="progress-bar bg-primary" role="progressbar" style="" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id= "xp">
 						    	</div>
@@ -151,83 +175,9 @@
 			var eventKnowledge = getKnowledge();
 			var eventXp = getXp();
 			var activeEvent =[username,3,0];
-			var upd = function(name, val){
-				//$('#'+name).css('height',(val*5)+'%');
-				$('#'+name).animate({
-					top: 100-(val*5) +'%',
-					height: val*5 +'%'
-				},1000);	
-				$('#'+name).attr('aria-valuenow'+(val*5));
-				//$('#'+name).css('top',100-(val*5)+'%')
-				//$("#"+name).text(val);
-				$("#"+name+'1').text(val);
-			}
-			var progressColor = function(name, val){
-				if(val <5){
-					if($('#'+name).hasClass('bg-warning')){
-						$('#'+name).removeClass('bg-warning');
-					}
-					if($('#'+name).hasClass('bg-danger')){
-						$('#'+name).removeClass('bg-danger');
-					}
-					$('#'+name).addClass('bg-danger');
-				}
-				else if(val >=5 && val <10){
-					if($('#'+name).hasClass('bg-warning')){
-						$('#'+name).removeClass('bg-warning');
-					}
-					if($('#'+name).hasClass('bg-danger')){
-						$('#'+name).removeClass('bg-danger');
-					}
-					$('#'+name).addClass('bg-warning');	
-				}
-				else{
-					if($('#'+name).hasClass('bg-warning')){
-						$('#'+name).removeClass('bg-warning');
-					}
-					if($('#'+name).hasClass('bg-danger')){
-						$('#'+name).removeClass('bg-danger');
-					}
-				}
-			}
-			var progressColorKn = function(name, val){
-				if(val <5){
-					if($('#'+name).hasClass('bg-warning')){
-						$('#'+name).removeClass('bg-warning');
-					}
-					if($('#'+name).hasClass('bg-danger')){
-						$('#'+name).removeClass('bg-danger');
-					}
-					if($('#'+name).hasClass('bg-success')){
-						$('#'+name).removeClass('bg-success');
-					}
-					$('#'+name).addClass('bg-danger');
-				}
-				else if(val >=5 && val <10){
-					if($('#'+name).hasClass('bg-warning')){
-						$('#'+name).removeClass('bg-warning');
-					}
-					if($('#'+name).hasClass('bg-danger')){
-						$('#'+name).removeClass('bg-danger');
-					}
-					if($('#'+name).hasClass('bg-success')){
-						$('#'+name).removeClass('bg-success');
-					}
-					$('#'+name).addClass('bg-warning');	
-				}
-				else if(val >=10 && val<15){
-					if($('#'+name).hasClass('bg-warning')){
-						$('#'+name).removeClass('bg-warning');
-					}
-					if($('#'+name).hasClass('bg-danger')){
-						$('#'+name).removeClass('bg-danger');
-					}
-					if($('#'+name).hasClass('bg-success')){
-						$('#'+name).removeClass('bg-success');
-					}
-					$('#'+name).addClass('bg-success');
-				}
-			}
+			var locked =0;
+			var scoreLeft=10;
+			var stat=[0,0,0];
 			if(username!=0){
 						$(document).ready(function(){
 							if(socket !== undefined){
@@ -254,6 +204,15 @@
 									});
 								});
 							});
+							socket.on('lockSignal'+username,function(data){
+								if(data==1){
+									locked=1;
+									$("#eventSelector").hide();
+								}
+								if(data==0){
+									locked=0;
+								}
+							})
 							socket.on('eventKnowledge',function(data){
 								eventPoolKnowledge = data;
 								$("#listKnowledge").empty();
@@ -285,7 +244,7 @@
 								})
 							});
 			
-							socket.on('updateScore'+ username, function(data){
+							/*socket.on('updateScore'+ username, function(data){
 								upd('hp',data[1]);
 								progressColor('hp',data[1]);
 								upd('mp',data[2]);
@@ -295,18 +254,85 @@
 								upd('xp',data[4]);
 								progressColorKn('xp',data[4]);
 			
-							});
+							});*/
+							socket.on('updateScore'+ username, function(data){
+								upd('hp',data.hp);
+								progressColor('hp',data.hp);
+								upd('mp',data.mp);
+								progressColor('mp',data.mp);
+								upd('kp',data.kp);
+								progressColorKn('kp',data.kp);
+								upd('xp',data.xp);
+								progressColorKn('xp',data.xp);
 			
+							});			
 							socket.on('changeColor'+ username, function(data){
 								console.log(data);
 								$("body").css("background-color","#"+data);
 								
 							});
-							/*
-							socket.on('submit', function(data){
-			
-							});
-							*/
+
+							socket.on('choiceStatus', function(data){
+								if(data==0){
+									$("#eventSelector").hide();
+									console.log("hided");
+								}
+								if(data==1 && locked==0){
+									$("#eventSelector").show();
+									console.log("show");
+								}
+							})
+							$("button[id*='btnPlus']").each(function(){
+								$(this).click(function(){
+									var tmp=$(this).attr("id");
+									var index= tmp[tmp.length-1];
+									if(index ==0 && scoreLeft !=0){
+										stat[0]+=1;
+										$("#phy").text(stat[0]);
+										scoreLeft-= 1;
+										$("#scoreLeft").text(scoreLeft);
+									}
+									if(index ==1 && scoreLeft !=0){
+										stat[1]+=1;
+										$("#res").text(stat[1]);
+										scoreLeft-= 1;
+										$("#scoreLeft").text(scoreLeft);
+									}
+									if(index ==2 && scoreLeft !=0){
+										stat[2]+=1;
+										$("#int").text(stat[2]);
+										scoreLeft-= 1;
+										$("#scoreLeft").text(scoreLeft);
+									}
+
+								});
+							})
+							$("button[id*='btnMinus']").each(function(){
+								$(this).click(function(){
+									//console.log(1);
+									var tmp=$(this).attr("id");
+									var index= tmp[tmp.length-1];
+									if(index ==0 && scoreLeft !=10 && stat[0]!=0){
+										stat[0]-=1;
+										$("#phy").text(stat[0]);
+										scoreLeft+= 1;
+										$("#scoreLeft").text(scoreLeft);
+									}
+									if(index ==1 && scoreLeft !=10 && stat[1]!=0){
+										stat[1]-=1;
+										$("#res").text(stat[1]);
+										scoreLeft+= 1;
+										$("#scoreLeft").text(scoreLeft);
+									}
+									if(index ==2 && scoreLeft !=10 && stat[2]!=0){
+										stat[2]-=1;
+										$("#int").text(stat[2]);
+										scoreLeft+= 1;
+										$("#scoreLeft").text(scoreLeft);
+									}
+
+								});
+							})		
 							$("#submitStat").click(function(){
 								var arr=[];
 								arr.push(parseInt(username));

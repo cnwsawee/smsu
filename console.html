@@ -27,6 +27,11 @@
 				<button type="button" class="btn btn-primary" id="submitEvent">Submit Event</button>
 				<br>
 				<button type="button" class="btn btn-primary" id="submitExam">Exam Score Update</button>
+				<br>
+				<button type="button" class="btn btn-primary" id="submitHide">Hide Choices</button>
+				<br>
+				<button type="button" class="btn btn-primary" id="submitShow">Show Choices</button>
+
 			</div>
 			<div class="col-md-8"> 
 				<div class="row"> HP
@@ -182,6 +187,12 @@
 						}
 
 					});
+				});
+				$("#submitHide").click(function(){
+					socket.emit("showSignal",0);
+				});
+				$("#submitShow").click(function(){
+					socket.emit("showSignal",1);
 				});
 
 				$("#submitEvent").click(function(){

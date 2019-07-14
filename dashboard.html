@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="./vendor/css/bootstrap.min.css">
+    <script src="./js/eventList.js"></script>
+    <script src="./vendor/js/socket.io.js"></script>
+	<script src="./vendor/js/jquery-3.4.1.min.js"></script>
+	<script type="text/javascript" src="./vendor/js/bootstrap.js"></script>
+	<style type="text/css">
+		
+	</style>
+</head>
+<body>
+	Dashboard
+	<button class="btn btn-primary" id="buttonUpdate"> Request Data</button>
+	<div class="container" >
+		<table class="table" id="dataTable">
+			<thead>
+				<tr>
+					<th scope="col">ID</th>
+					<th scope="col">HP</th>
+					<th scope="col">MP</th>
+					<th scope="col">KP</th>
+					<th scope="col">XP</th>
+				</tr>
+			</thead>
+			<tbody id="tableBody">
+				
+			</tbody>
+		</table>
+	</div>
+	<script>
+		
+		(function(){
+			var socket= io();
+			console.log(1);
+
+			class User{
+				constructor(id,hp,mp,kp,xp){
+					this.id=id;
+					this.hp=hp;
+					this.mp=mp;
+					this.kp=kp;
+					this.xp=xp;		
+				}
+			}
+
+
+			$(document).ready(function(){
+				if(socket !== undefined){
+					console.log('Connected');
+				};
+				socket.on('currentUser',function(data){
+					console.log('getdata');
+					$("#tableBody").empty();
+					data.forEach(function(element,index){
+						console.log(element);
+						$("#tableBody").append("<tr><th scope=\"row\">"+element.id+"</th><td>"+element.hp+"</td><td>"+element.mp+"</td><td>"+element.kp+"</td><td>"+element.xp+"</td></tr>")
+					});
+				})
+
+
+				$("#buttonUpdate").click(function(){
+					socket.emit('requestUser',1);
+				})
+			})
+		})();
+	</script>
+</body>
