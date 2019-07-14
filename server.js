@@ -169,15 +169,15 @@ io.on('connection', function(socket){
 
 		if(tmp.hp<0) {
 			tmp.hp+=userStat[index].modPhy;
-			if(tmp.hp<0) tmp.hp=0;
+			if(tmp.hp>0) tmp.hp=0;
 		}
 		if(tmp.mp<0) {
 			tmp.mp+=userStat[index].modRes;
-			if(tmp.mp<0) tmp.mp=0;
+			if(tmp.mp>0) tmp.mp=0;
 		}
 		if(tmp.kp>0) {
 			tmp.kp+=userStat[index].modInt;
-			if(tmp.kp>0) tmp.kp=0;
+			if(tmp.kp<0) tmp.kp=0;
 		}
 		//status[username][0]++;
 		//console.log(username,scoreChange,2);
