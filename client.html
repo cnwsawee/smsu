@@ -336,19 +336,21 @@
 							$("#submitStat").click(function(){
 								var arr=[];
 								arr.push(parseInt(username));
-								arr.push(parseInt($('#phy').val()));
-								arr.push(parseInt($('#res').val()));
-								arr.push(parseInt($('#int').val()));
+								arr.push(parseInt($('#phy').text()));
+								arr.push(parseInt($('#res').text()));
+								arr.push(parseInt($('#int').text()));
 								socket.emit("sendStat",arr);
 								$('#statModal').modal("hide");
 							});
 			
 							socket.on('requestEvent',function(data){
-								socket.emit('sendEvent',activeEvent);
-								$("li[id*='event']").each(function(){
-									$(this).removeClass('active');
-								})
-								activeEvent=[username,3,0];
+								if(locked==0){
+									socket.emit('sendEvent',activeEvent);
+									$("li[id*='event']").each(function(){
+										$(this).removeClass('active');
+									})
+									activeEvent=[username,3,0];
+								}
 							})
 			
 							$("#submitEvent").click(function(){

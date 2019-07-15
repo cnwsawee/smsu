@@ -25,11 +25,12 @@
 			</div>
 		</div>
 	</div>
-	<div class="container" id="groupContainer">
-		<div class="row"> 
-			Current User
+	<div class="row" style="padding-left: 50px;"> 
+			Current User	
 			<span id="totalUser" >1</span>
 		</div>
+	<div class="container" id="groupContainer">
+		
 		<br>
 		<div class="row">
 			<div class="col-md-3">
@@ -96,7 +97,6 @@
 			$(document).ready(function(){
 				var socket =io();
 				var currentUser = [];
-				currentUser = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
 				var team=[];
 				for(var x=0;x<10;x++){
 					team[x]=[];
@@ -104,12 +104,12 @@
 				var currentNumber=4;
 
 				$("#requestUser").click(function(){
-					socket.emit("requestUser",1);
+					socket.emit("requestUserColor",1);
 				});
 
-				socket.on("currentUser",function(data){
-					currentUser=data;
-					$("#totalUser").val(data);
+				socket.on("currentUserList",function(data){
+					currentUser=data.slice();
+					$("#totalUser").text(currentUser);
 				});
 
 				$("#playerButton").click(function(){
@@ -118,27 +118,40 @@
 					$("#groupContainer").empty();
 					for(var x=0;x<currentNumber;x++){
 						$("#groupContainer").append("<div class=\"row\"><div class=\"col-md-3\"><span id=\"team"+x+"\">1</span></div><div class=\"col-md-3\"><input class=\"jscolor\" value=\"AB2567\" id=\"color"+x+"\"></div><div class=\"col-md-1\"><input type=\"number\" class=\"form-control form-upd\" id=\"hp"+x+"\"></div><div class=\"col-md-1\"><input type=\"number\" class=\"form-control form-upd\" id=\"mp"+x+"\"></div><div class=\"col-md-1\"><input type=\"number\" class=\"form-control form-upd\" id=\"kp"+x+"\"></div><div class=\"col-md-1\"><input type=\"number\" class=\"form-control form-upd\" id=\"xp"+x+"\"></div><div class=\"col-md-2\"><button class=\"btn btn-primary\" id=\"button"+x+"\">Submit</button></div></div><br>");
-						$("#button"+x).click(function(){
+					}
+
+					$("button[id*='button']").each(function(){
+						$(this).click(function(){
+							var tmp=$(this).attr('id')
+							var x=tmp[tmp.length-1];
 							for(var y=0;y<team[x].length;y++){
+								//console.log(21);
 								var sendEvent=[];
 								sendEvent.push(team[x][y]);
-								sendEvent.push($("#eventName").text());
+								sendEvent.push($("#eventName").val());
 								sendEvent.push($("#hp"+x).val());
 								sendEvent.push($("#mp"+x).val());
 								sendEvent.push($("#kp"+x).val());
 								sendEvent.push($("#xp"+x).val());
+								for(var k=2;k<6;k++){
+									if(sendEvent[k]==""){
+										sendEvent[k]=0;
+									}
+								}
+								console.log(sendEvent);
 								socket.emit("sendRandom",sendEvent);
+								console.log(1);
 							}
 							socket.emit("sendLocked",team[x]);
-							
+
 						})
-					}
+					})
 					jscolor.installByClassName("jscolor");
 
 
 				});
 				$("#randomUser").click(function(){
-					for(var x=0;x<4;x++){
+					for(var x=0;x<currentNumber;x++){
 						team[x]=[];
 					};
 					for(var x=0;x<currentUser.length;x++){
@@ -152,12 +165,12 @@
 								}
 							}
 							tmp.push(rand);
-							team[rand].push(currentUser[x]);
+							team[rand].push(parseInt(currentUser[x]));
 						};
 					};
-					console.log(team[0]);
 					for(var x=0;x<currentNumber;x++){
 						console.log(team[x]);
+						console.log(team[x].length);
 						$("#team"+x).text(team[x]);
 					};
 				});
@@ -167,24 +180,31 @@
 					currentUser.forEach(function(element,index){
 						sendData[element]=0;
 						for(var x=0;x<currentNumber;x++){
-							if(team[x].includes(element)){
-								sendData[element]=$("#color"+x).val();
+							//console.log(x);
+							//console.log(team[x]);
+							for(var y=0;y<team[x].length;y++){
+								if(team[x][y]==element){
+									sendData[element]=$("#color"+x).val();
+								//console.log(x,$("#color"+x).val());	
+								}
 							}
+							/*if(team[x].includes(element)){
+								sendData[element]=$("#color"+x).val();
+								console.log(x,$("#color"+x).val());
+							}*/
+
 						}
 						
 					})
 					socket.emit("changeColor",sendData);
+					console.log(sendData);
 				});
 
 				$("#resetColor").click(function(){
 					var sendData=[];
 					currentUser.forEach(function(element,index){
 						sendData[element]=0;
-						for(var x=0;x<currentNumber;x++){
-							if(team[x].includes(element)){
-								sendData[element]="FFFFFF";
-							}
-						}
+						sendData[element]="FFFFFF";
 					})
 					socket.emit("changeColor",sendData);
 				});

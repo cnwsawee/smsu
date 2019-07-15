@@ -31,6 +31,8 @@
 				<button type="button" class="btn btn-primary" id="submitHide">Hide Choices</button>
 				<br>
 				<button type="button" class="btn btn-primary" id="submitShow">Show Choices</button>
+				<br>
+				<button type="button" class="btn btn-primary" id="clearLock">Clear Lock</button>
 
 			</div>
 			<div class="col-md-8"> 
@@ -101,23 +103,27 @@
 
 			$(document).ready(function(){
 				$("#submit").click(function(){
-					var arr=[];
-					arr.push(parseInt($('#team').val()));
-					arr.push(parseInt($('#hp').val()));
-					arr.push(parseInt($('#mp').val()));
-					arr.push(parseInt($('#kp').val()));
-					arr.push(parseInt($('#xp').val()));
-					console.log(arr);
-					socket.emit('console',arr);
+					if($('#team').val()!=""){
+						var arr=[];
+						arr.push(parseInt($('#team').val()));
+						arr.push(parseInt($('#hp').val()));
+						arr.push(parseInt($('#mp').val()));
+						arr.push(parseInt($('#kp').val()));
+						arr.push(parseInt($('#xp').val()));
+						console.log(arr);
+						socket.emit('console',arr);
+					}
 				});
 				$("#submitOverride").click(function(){
-					var arr=[];
-					arr.push(parseInt($('#team').val()));
-					arr.push(parseInt($('#hp').val()));
-					arr.push(parseInt($('#mp').val()));
-					arr.push(parseInt($('#kp').val()));
-					arr.push(parseInt($('#xp').val()));
-					socket.emit('consoleOverride',arr);
+					if($('#team').val()!=""){
+						var arr=[];
+						arr.push(parseInt($('#team').val()));
+						arr.push(parseInt($('#hp').val()));
+						arr.push(parseInt($('#mp').val()));
+						arr.push(parseInt($('#kp').val()));
+						arr.push(parseInt($('#xp').val()));
+						socket.emit('consoleOverride',arr);
+					}	
 				});
 				$("#eventButton").click(function(){
 					listRegenActive = listRegenActive.sort();
@@ -128,9 +134,11 @@
 					socket.emit('listXpActive',listXpActive);
 				});
 				$("#submitExam").click(function(){
-					io.emit('examSignal',1);
+					socket.emit('examSignal',1);
 				});
-				
+				$("#clearLock").click(function(){
+					socket.emit('clearLock',1);
+				});
 				$("li[id*='eventRegen']").each(function(index){
 					$(this).click(function(){
 						if(!$(this).hasClass('active')){
