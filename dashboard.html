@@ -57,6 +57,7 @@
 					<th scope="col">MP</th>
 					<th scope="col">KP</th>
 					<th scope="col">XP</th>
+					<th scope="col">Lock</th>
 				</tr>
 			</thead>
 			<tbody id="tableBody">
@@ -70,6 +71,7 @@
 			var socket= io();
 			console.log(1);
 			var userIndex =0;
+			var lockedUser;
 
 			class User{
 				constructor(id,hp,mp,kp,xp){
@@ -77,7 +79,8 @@
 					this.hp=hp;
 					this.mp=mp;
 					this.kp=kp;
-					this.xp=xp;		
+					this.xp=xp;
+					this.locked=0;	
 				}
 			}
 			class Event{
@@ -94,11 +97,11 @@
 					console.log('Connected');
 				};
 				socket.on('currentUser',function(data){
-					console.log('getdata');
+					//console.log('getdata');
 					$("#tableBody").empty();
 					data.forEach(function(element,index){
 						console.log(element);
-						$("#tableBody").append("<tr><th scope=\"row\" id=\"rowUser"+element.id+"\">"+element.id+"</th><td>"+element.hp+"</td><td>"+element.mp+"</td><td>"+element.kp+"</td><td>"+element.xp+"</td></tr>")
+						$("#tableBody").append("<tr><th scope=\"row\" id=\"rowUser"+element.id+"\">"+element.id+"</th><td>"+element.hp+"</td><td>"+element.mp+"</td><td>"+element.kp+"</td><td>"+element.xp+"</td><td id=\"locked"+element.id+"\">"+element.locked+"</td></tr>")
 					});
 					$("td").each(function(index){
 						var value=$(this).text();
@@ -113,12 +116,25 @@
 							socket.emit('getEvent',userIndex);
 						})
 					})
+					$("td[id*='locked']").each(function(){
+						$(this).click(function(){
+							var tmp = $(this).attr('id');
+							var name = tmp[tmp.length-1];
+							var data=[];
+							data.push(name);
+							if($(this).val()==0){
+								socket.emit('sendLocked',data);
+							}
+						})
+					})
+					
 				})
 
 				socket.on('userEventList',function(data){
 					$("#eventBody").empty();
 					data.forEach(function(element,index){
 						console.log(element);
+						$("#modalName").text("Event List for User"+userIndex);
 						$("#eventBody").append("<tr><th scope=\"row\" id=\"rowEvent"+index+"\">"+element.name+"</th><td>"+element.hp+"</td><td>"+element.mp+"</td><td>"+element.kp+"</td><td>"+element.xp+"</td></tr>")
 					});
 					$("#eventModal").show();
@@ -132,6 +148,7 @@
 				$("#buttonUpdate").click(function(){
 					socket.emit('requestUser',1);
 				})
+				
 			})
 		})();
 	</script>

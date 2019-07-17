@@ -13,6 +13,7 @@ var listRegenActive =[];
 var listKnowledgeActive =[];
 var listXpActive =[];
 var lockedUser=[];
+var showStatus=1;
 
 app.set('port',8080);
 app.set('ip', '0.0.0.0');
@@ -52,12 +53,13 @@ class Event{
 	}
 }
 class User{
-	constructor(id,hp,mp,kp,xp){
+	constructor(id,hp,mp,kp,xp,locked){
 		this.id=id;
 		this.hp=hp;
 		this.mp=mp;
 		this.kp=kp;
-		this.xp=xp;		
+		this.xp=xp;
+		this.locked=locked;		
 	}
 	applyScore(score){
 		if(score.hp == null) score.hp = 0;
@@ -100,28 +102,34 @@ io.on('connection', function(socket){
 	socket.on('start',function(data){
 		if(data!=0){
 			var tmp=0;
+			var index;
 			currentUser.forEach(function(element,index){
 				if(element.id==data) tmp=1;
 			});
 			if(tmp==0){
-				currentUser.push(new User(data,10,10,0,0));
+				currentUser.push(new User(data,10,10,0,0,0));
 				console.log('add user');
-				var index=getUserById(data,currentUser);
+				index=getUserById(data,currentUser);
 				userSelectedEvent[index]=[];
 			}
 			if(statSubmission[data]==0) {
 				io.emit('statSubmission'+data,0);
+				index=getUserById(data,currentUser);
 			}
-			
-			io.emit('updateScore'+data,currentUser[index]);
+			io.emit('updateScore'+data,currentUser[getUserById(data,currentUser)]);
 			io.emit('eventRegen',listRegenActive);
 			io.emit('eventKnowledge',listKnowledgeActive);
 			io.emit('eventXp',listXpActive);
-			lockedUser.forEach(function(element,index){
-				if(element == data){
-					io.emit('lockSignal'+data,1);
-				}
-			})
+			io.emit("choiceStatus",showStatus);
+
+			if(currentUser[getUserById(data,currentUser)].locked==1){
+				io.emit('lockSignal'+currentUser[getUserById(data,currentUser)].id,1);
+			}
+		}
+	})
+	socket.on('allowEvent',function(data){
+		if(data==1){
+			io.emit('allowEventChange',1);
 		}
 	})
 	socket.on('sendEvent', function(data){
@@ -134,25 +142,26 @@ io.on('connection', function(socket){
 		else if(data[1] == 2) scoreChange = eventListXp[data[2]].slice();
 
 		var tmp = new Event(scoreChange[0],scoreChange[1],scoreChange[2],scoreChange[3],scoreChange[4])
-
-		userSelectedEvent[index].push(tmp);
-
-		if(tmp.hp<0) {
-			tmp.hp+=userStat[index].modPhy;
-			if(tmp.hp>0) tmp.hp=0;
-		}
-		if(tmp.mp<0) {
-			tmp.mp+=userStat[index].modRes;
-			if(tmp.mp>0) tmp.mp=0;
-		}
-		if(tmp.kp>0) {
-			tmp.kp+=userStat[index].modInt;
-			if(tmp.kp<0) tmp.kp=0;
-		}
-		//status[username][0]++;
-		//console.log(username,scoreChange,2);
-		currentUser[index].applyScore(tmp);
-		io.emit('updateScore'+currentUser[index].id,currentUser[index]);
+		if(scoreChange!= []){
+				userSelectedEvent[index].push(tmp);
+		
+				if(tmp.hp<0) {
+					tmp.hp+=userStat[index].modPhy;
+					if(tmp.hp>0) tmp.hp=0;
+				}
+				if(tmp.mp<0) {
+					tmp.mp+=userStat[index].modRes;
+					if(tmp.mp>0) tmp.mp=0;
+				}
+				if(tmp.kp>0) {
+					tmp.kp+=userStat[index].modInt;
+					if(tmp.kp<0) tmp.kp=0;
+				}
+				//status[username][0]++;
+				//console.log(username,scoreChange,2);
+				currentUser[index].applyScore(tmp);
+				io.emit('updateScore'+currentUser[index].id,currentUser[index]);
+			}
 	});
 	socket.on('getEvent',function(data){
 		var index=getUserById(data,currentUser);
@@ -178,17 +187,24 @@ io.on('connection', function(socket){
 		io.emit('updateScore'+currentUser[index].id,currentUser[index]);
 	});
 	socket.on("sendLocked",function(data){
-		lockedUser=data;
-		for(var x=0;x<data.length;x++){
-			io.emit('lockSignal'+data[x],1);
-		}
+		data.forEach(function(element,index){
+			if(!lockedUser.includes(element)) lockedUser.push(element);
+		})
+		lockedUser.sort();
+		lockedUser.forEach(function(element,index){
+			currentUser[getUserById(element,currentUser)].locked=1;
+			io.emit('lockSignal'+element,1);
+		})
 	});
 	socket.on("clearLock", function(data){
-		for(var x=0;x<lockedUser.length;x++){
-			io.emit('lockSignal'+lockedUser[x],0);
-		}
+		lockedUser.forEach(function(element,index){
+			currentUser[getUserById(element,currentUser)].locked=0;
+			io.emit('lockSignal'+element,0);
+		})
+		lockedUser=[];
 	});
 	socket.on("showSignal", function(data){
+		showStatus=data;
 		io.emit("choiceStatus",data);
 	});
 	socket.on('examSignal', function(data){
@@ -198,7 +214,7 @@ io.on('connection', function(socket){
 			if(element.kp<0) element.kp=0;
 			tmp=element.kp-tmp;
 			var tmpEvent=new Event("Exam",0,0,tmp,0);
-			userSelectedEvent[index].push(tmpEvent);
+			userSelectedEvent[index].push(tmp);
 			io.emit('updateScore'+element.id,element);
 		});
 	});
@@ -206,12 +222,15 @@ io.on('connection', function(socket){
 		var index=getUserById(data[0],currentUser);
 		var tmp = new Event("Override",data[1],data[2],data[3],data[4]);
 		currentUser[index].applyScore(tmp);
+		userSelectedEvent[index].push(tmpEvent);
+		io.emit('updateScore'+currentUser[index].id,currentUser[index]);
 	})
 	socket.on('consoleOverride', function(data){
 		var index=getUserById(data[0],currentUser);
 		var tmp = new Event("Override",data[1]-currentUser[index].hp,data[2]-currentUser[index].mp,data[3]-currentUser[index].kp,data[4]-currentUser[index].xp);
 		currentUser[index].applyScore(tmp);
-
+		userSelectedEvent[index].push(tmp);
+		io.emit('updateScore'+currentUser[index].id,currentUser[index]);
 	});
 	socket.on('sendStat',function(data){
 		var index= getUserById(data[0],currentUser);
@@ -241,6 +260,9 @@ io.on('connection', function(socket){
 	});
 	socket.on('requestUser', function(data){
 		io.emit('currentUser',currentUser);
+	})
+	socket.on('getLockedUser', function(data){
+		io.emit('sendLockedUser',lockedUser);
 	})
 //----------------Event List----------------//
 	socket.on('listRegenActive',function(data){

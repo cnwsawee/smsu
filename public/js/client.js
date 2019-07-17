@@ -5,6 +5,7 @@ class User{
 		this.mp=mp;
 		this.kp=kp;
 		this.xp=xp;		
+		this.locked=0;
 	}
 
 	applyScore(score){

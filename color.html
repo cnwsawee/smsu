@@ -97,6 +97,7 @@
 			$(document).ready(function(){
 				var socket =io();
 				var currentUser = [];
+				currentUser=[1,2,3,4,5,6,7,8,9];
 				var team=[];
 				for(var x=0;x<10;x++){
 					team[x]=[];
@@ -122,6 +123,7 @@
 
 					$("button[id*='button']").each(function(){
 						$(this).click(function(){
+							socket.emit('clearLock',1);
 							var tmp=$(this).attr('id')
 							var x=tmp[tmp.length-1];
 							for(var y=0;y<team[x].length;y++){
@@ -154,7 +156,7 @@
 					for(var x=0;x<currentNumber;x++){
 						team[x]=[];
 					};
-					for(var x=0;x<currentUser.length;x++){
+					for(var x=0;x<currentUser.length;){
 						var tmp=[];
 						for(y=0;y<currentNumber && x<currentUser.length;y++,x++){
 							var rand;

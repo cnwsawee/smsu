@@ -178,6 +178,7 @@
 			var locked =0;
 			var scoreLeft=10;
 			var stat=[0,0,0];
+			var allowEventChange =3;
 			if(username!=0){
 						$(document).ready(function(){
 							if(socket !== undefined){
@@ -189,23 +190,30 @@
 									$('#statModal').modal("show");
 								}
 							});
+							socket.on('allowEventChange',function(data){
+								allowEventChange=3;
+							})
 							socket.on('eventRegen',function(data){
-								eventPoolRegen = data;
-								$("#listRegen").empty();
-								eventPoolRegen.forEach(function(element,index){
-									$("#listRegen").append("<li class=\"list-group-item liRegen liEvent\" id=\"eventRegen"+element+"\">"+eventRegen[element][0]);
-									//$("#eventRegen"+element).unbind('click');
-									$("#eventRegen"+element).click(function(){
-										$("li[id*='event']").each(function(){
-											$(this).removeClass('active');
-										})
-										$(this).addClass('active');
-										activeEvent =[username,0,element];
+								if(allowEventChange!=0){
+									eventPoolRegen = data;
+									$("#listRegen").empty();
+									eventPoolRegen.forEach(function(element,index){
+										$("#listRegen").append("<li class=\"list-group-item liRegen liEvent\" id=\"eventRegen"+element+"\">"+eventRegen[element][0]);
+										//$("#eventRegen"+element).unbind('click');
+										$("#eventRegen"+element).click(function(){
+											$("li[id*='event']").each(function(){
+												$(this).removeClass('active');
+											})
+											$(this).addClass('active');
+											activeEvent =[username,0,element];
+										});
 									});
-								});
+									allowEventChange-=1;
+								}
 							});
 							socket.on('lockSignal'+username,function(data){
 								if(data==1){
+									console.log('locked1');
 									locked=1;
 									$("#eventSelector").hide();
 								}
@@ -214,48 +222,44 @@
 								}
 							})
 							socket.on('eventKnowledge',function(data){
-								eventPoolKnowledge = data;
-								$("#listKnowledge").empty();
-								eventPoolKnowledge.forEach(function(element,index){
-									$("#listKnowledge").append("<li class=\"list-group-item liKnowledge liEvent\" id=\"eventKnowledge"+element+"\">"+eventKnowledge[element][0]);
-									//$("#eventKnowledge"+element).unbind('click');
-									$("#eventKnowledge"+element).click(function(){
-										$("li[id*='event']").each(function(){
-											$(this).removeClass('active');
-										})
-										$(this).addClass('active');
-										activeEvent =[username,1,element];
-									});	
-								})
+								if(allowEventChange!=0){
+									eventPoolKnowledge = data;
+									$("#listKnowledge").empty();
+									eventPoolKnowledge.forEach(function(element,index){
+										$("#listKnowledge").append("<li class=\"list-group-item liKnowledge liEvent\" id=\"eventKnowledge"+element+"\">"+eventKnowledge[element][0]);
+										//$("#eventKnowledge"+element).unbind('click');
+										$("#eventKnowledge"+element).click(function(){
+											$("li[id*='event']").each(function(){
+												$(this).removeClass('active');
+											})
+											$(this).addClass('active');
+											activeEvent =[username,1,element];
+										});	
+									})
+									allowEventChange-=1;
+								}
 							});
 							socket.on('eventXp',function(data){
-								eventPoolXp = data;
-								$("#listXp").empty();
-								eventPoolXp.forEach(function(element,index){
-									$("#listXp").append("<li class=\"list-group-item liXp liEvent\" id=\"eventXp"+element+"\">"+eventXp[element][0]);
-									//$("#eventXp"+element).unbind('click');
-									$("#eventXp"+element).click(function(){
-										$("li[id*='event']").each(function(){
-											$(this).removeClass('active');
-										})
-										$(this).addClass('active');
-										activeEvent =[username,2,element];
-									});
-								})
+								if(allowEventChange!=0){
+									eventPoolXp = data;
+									$("#listXp").empty();
+									eventPoolXp.forEach(function(element,index){
+										$("#listXp").append("<li class=\"list-group-item liXp liEvent\" id=\"eventXp"+element+"\">"+eventXp[element][0]);
+										//$("#eventXp"+element).unbind('click');
+										$("#eventXp"+element).click(function(){
+											$("li[id*='event']").each(function(){
+												$(this).removeClass('active');
+											})
+											$(this).addClass('active');
+											activeEvent =[username,2,element];
+										});
+									})
+									allowEventChange-=1;
+								}
 							});
 			
-							/*socket.on('updateScore'+ username, function(data){
-								upd('hp',data[1]);
-								progressColor('hp',data[1]);
-								upd('mp',data[2]);
-								progressColor('mp',data[2]);
-								upd('kp',data[3]);
-								progressColorKn('kp',data[3]);
-								upd('xp',data[4]);
-								progressColorKn('xp',data[4]);
-			
-							});*/
 							socket.on('updateScore'+ username, function(data){
+								console.log(data);
 								upd('hp',data.hp);
 								progressColor('hp',data.hp);
 								upd('mp',data.mp);
@@ -345,12 +349,43 @@
 			
 							socket.on('requestEvent',function(data){
 								if(locked==0){
+									$(".active").each(function(){
+										var name = $(this).attr('id');
+										var num
+										if(name[5]=='R') {
+											activeEvent[1]=0;
+											num=name.substr(10)
+										}
+										else if(name[5]=='K') {
+											activeEvent[1]=1;
+											num=name.substr(14)
+										}
+										else if(name[5]=='X') {
+											activeEvent[1]=2;
+											num=name.substr(7)
+										}
+										activeEvent[2]=parseInt(num);
+
+									})
+										if(activeEvent!=[username,3,0]){
+											socket.emit('sendEvent',activeEvent);
+											console.log('send' + activeEvent);
+											$("li[id*='event']").each(function(){
+												$(this).removeClass('active');
+											})
+											activeEvent=[username,3,0];
+										}
+									
+								}
+									/*
 									socket.emit('sendEvent',activeEvent);
 									$("li[id*='event']").each(function(){
 										$(this).removeClass('active');
 									})
 									activeEvent=[username,3,0];
-								}
+									*/
+									
+								
 							})
 			
 							$("#submitEvent").click(function(){

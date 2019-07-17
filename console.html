@@ -126,12 +126,14 @@
 					}	
 				});
 				$("#eventButton").click(function(){
+					socket.emit('allowEvent',1);
 					listRegenActive = listRegenActive.sort();
 					socket.emit('listRegenActive',listRegenActive);
 					listKnowledgeActive = listKnowledgeActive.sort();
 					socket.emit('listKnowledgeActive',listKnowledgeActive);
 					listXpActive = listXpActive.sort();
 					socket.emit('listXpActive',listXpActive);
+
 				});
 				$("#submitExam").click(function(){
 					socket.emit('examSignal',1);
