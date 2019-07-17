@@ -15,6 +15,17 @@ class User{
 		this.xp+=score.xp;
 	}
 }
+class Stat{
+	constructor(id,phy,res,int){
+		this.id=id;
+		this.phy=phy;
+		this.res=res;
+		this.int=int;
+		this.modPhy=Math.floor((phy-1)/3);
+		this.modRes=Math.floor((res-1)/3);
+		this.modInt=Math.floor((int-1)/3);
+	}
+}
 var upd = function(name, val){
 	//$('#'+name).css('height',(val*5)+'%');
 	$('#'+name).animate({

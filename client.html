@@ -100,6 +100,39 @@
     			</div>
   			</div>
 		</div>
+		<div class="modal" tabindex="-1" role="dialog" id="showStatModal">
+  			<div class="modal-dialog" role="document">
+    			<div class="modal-content">
+      				<div class="modal-header">
+        				<h5 class="modal-title" id="showStatName">View Stat</h5>
+        					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          						<span aria-hidden="true">&times;</span>
+        				</button>
+      				</div>
+      				<div class="modal-body">
+      					<div class="row">
+	      					<div class="col-md-6">
+	      						Endurance =
+	      						<br>
+	      						Resilience =
+	      						<br>
+	      						Intelligence =
+	      					</div>
+	      					<div class="col-md-6">
+	      						<span id="showEnd">0</span>
+	      						<br>
+	      						<span id="showRes">0</span>
+	      						<br>
+	      						<span id="showInt">0</span>
+	      					</div>
+						</div>
+      				</div>
+      				<div class="modal-footer">
+       					<button type="button" class="btn btn-primary" id="closeButton">Close</button>
+      				</div>
+    			</div>
+  			</div>
+		</div>
 		<div class="row" id="eventSelector">
 			<div class="col-md-4 col-sm-4">
 				<ul class="list-group" id="listRegen"></ul>
@@ -161,6 +194,7 @@
 						 <span class="statusNumber" id="xp1">0<span>
 			</div>
 		</div>
+		<button class = "btn btn-primary" id="showStat"> Show Stat</button>
 	</div>
 	
 	<script >
@@ -387,11 +421,24 @@
 									
 								
 							})
-			
+
+							socket.on('showStat'+username,function(data){
+								$("#showStatModal").show();
+								$("#showEnd").text(data.phy);
+								$("#showRes").text(data.res);
+								$("#showInt").text(data.int);
+							})
+							$("#closeButton").click(function(){
+								$("#showStatModal").hide();
+							})
 							$("#submitEvent").click(function(){
 								console.log(activeEvent);
 								socket.emit('sendEvent',activeEvent);
 							});
+							$("#showStat").click(function(){
+								socket.emit('requestStat',username);
+							})
+
 			
 						});}
 		})();	

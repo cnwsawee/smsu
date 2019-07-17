@@ -264,6 +264,10 @@ io.on('connection', function(socket){
 	socket.on('getLockedUser', function(data){
 		io.emit('sendLockedUser',lockedUser);
 	})
+	socket.on('requestStat',function(data){
+		var index = getUserById(data,currentUser);
+		io.emit('showStat'+data,userStat[index]);
+	})
 //----------------Event List----------------//
 	socket.on('listRegenActive',function(data){
 		listRegenActive=data;
