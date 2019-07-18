@@ -214,7 +214,7 @@ io.on('connection', function(socket){
 			if(element.kp<0) element.kp=0;
 			tmp=element.kp-tmp;
 			var tmpEvent=new Event("Exam",0,0,tmp,0);
-			userSelectedEvent[index].push(tmp);
+			userSelectedEvent[index].push(tmpEvent);
 			io.emit('updateScore'+element.id,element);
 		});
 	});
