@@ -242,6 +242,7 @@ io.on('connection', function(socket){
 		var tmp = new Event("Override",data[1]-currentUser[index].hp,data[2]-currentUser[index].mp,data[3]-currentUser[index].kp,data[4]-currentUser[index].xp);
 		currentUser[index].applyScore(tmp);
 		userSelectedEvent[index].push(tmp);
+		currentUser[index].eventCount-=1;
 		io.emit('updateScore'+currentUser[index].id,currentUser[index]);
 	});
 	socket.on('sendStat',function(data){

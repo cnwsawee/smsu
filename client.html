@@ -312,11 +312,11 @@
 								progressColorKn('kp',data.kp);
 								upd('xp',data.xp);
 								progressColorKn('xp',data.xp);
-								if(data.failedCount!=0){
-									$("#failedCount").text(data.failedCount);
+								if(data.failed!=0){
+									$("#failedCount").text("Exam failed = "data.failed);
 								}
 								if(data.death!=0){
-									$("#deathCount").text(data.death);
+									$("#deathCount").text("Death ="data.death);
 								}
 							});	
 
