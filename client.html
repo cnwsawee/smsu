@@ -313,10 +313,10 @@
 								upd('xp',data.xp);
 								progressColorKn('xp',data.xp);
 								if(data.failedCount!=0){
-									$("#failedCount").text(1);
+									$("#failedCount").text(data.failedCount);
 								}
 								if(data.death!=0){
-									$("#deathCount").text(1);
+									$("#deathCount").text(data.death);
 								}
 							});	
 
