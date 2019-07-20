@@ -6,6 +6,9 @@ class User{
 		this.kp=kp;
 		this.xp=xp;		
 		this.locked=0;
+		this.death=0;
+		this.failed=0;
+		this.eventCount=0;
 	}
 
 	applyScore(score){

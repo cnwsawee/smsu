@@ -111,14 +111,14 @@
       				</div>
       				<div class="modal-body">
       					<div class="row">
-	      					<div class="col-md-6">
+	      					<div class="col-sm-6">
 	      						Endurance =
 	      						<br>
 	      						Resilience =
 	      						<br>
 	      						Intelligence =
 	      					</div>
-	      					<div class="col-md-6">
+	      					<div class="col-sm-6">
 	      						<span id="showEnd">0</span>
 	      						<br>
 	      						<span id="showRes">0</span>
@@ -195,6 +195,16 @@
 			</div>
 		</div>
 		<button class = "btn btn-primary" id="showStat"> Show Stat</button>
+		<div class="row">
+			<div class="col-md-6">
+				<span id="deathCount">
+				</span>
+			</div>
+			<div class="col-md-6">
+				<span id="failedCount">
+				</span>
+			</div>
+		</div>
 	</div>
 	
 	<script >
@@ -302,8 +312,15 @@
 								progressColorKn('kp',data.kp);
 								upd('xp',data.xp);
 								progressColorKn('xp',data.xp);
-			
-							});			
+								if(data.failedCount!=0){
+									$("#failedCount").text(1);
+								}
+								if(data.death!=0){
+									$("#deathCount").text(1);
+								}
+							});	
+
+
 							socket.on('changeColor'+ username, function(data){
 								console.log(data);
 								$("body").css("background-color","#"+data);

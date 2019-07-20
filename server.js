@@ -59,7 +59,10 @@ class User{
 		this.mp=mp;
 		this.kp=kp;
 		this.xp=xp;
-		this.locked=locked;		
+		this.locked=locked;	
+		this.death=0;
+		this.failed=0;
+		this.eventCount=0;	
 	}
 	applyScore(score){
 		if(score.hp == null) score.hp = 0;
@@ -74,6 +77,11 @@ class User{
 		if(this.mp<0) this.mp=0;
 		if(this.kp<0) this.kp=0;
 		if(this.xp<0) this.xp=0;
+
+		if(this.hp == 0 || this.mp ==0){
+			this.death++;
+		}
+		this.eventCount++;
 		return this.id;
 	}
 }
@@ -142,7 +150,7 @@ io.on('connection', function(socket){
 		else if(data[1] == 2) scoreChange = eventListXp[data[2]].slice();
 
 		var tmp = new Event(scoreChange[0],scoreChange[1],scoreChange[2],scoreChange[3],scoreChange[4])
-		if(scoreChange!= []){
+		if(scoreChange[0]!=null){
 				userSelectedEvent[index].push(tmp);
 		
 				if(tmp.hp<0) {
@@ -210,6 +218,10 @@ io.on('connection', function(socket){
 	socket.on('examSignal', function(data){
 		currentUser.forEach(function(element, index){
 			var tmp=element.kp;
+			if(element.kp<10) {
+				element.failed++;
+				io.emit('failed'+element.id,element.failed);
+			}
 			element.kp=Math.ceil((element.kp-10)/2);
 			if(element.kp<0) element.kp=0;
 			tmp=element.kp-tmp;

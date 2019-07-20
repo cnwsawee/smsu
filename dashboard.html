@@ -27,21 +27,22 @@
           						<span aria-hidden="true">&times;</span>
         				</button>
       				</div>
-      				<div class="modal-body">
-      					<table class="table" id="eventTable">
-							<thead>
-								<tr>
-									<th scope="col">Event Name</th>
-									<th scope="col">HP</th>
-									<th scope="col">MP</th>
-									<th scope="col">KP</th>
-									<th scope="col">XP</th>
-								</tr>
-							</thead>
-							<tbody id="eventBody">
+      				<div class="modal-body" style="height:80vh;overflow-y: auto;">
+	      					<table class="table" id="eventTable">
+								<thead>
+									<tr>
+										<th scope="col">Event Name</th>
+										<th scope="col">HP</th>
+										<th scope="col">MP</th>
+										<th scope="col">KP</th>
+										<th scope="col">XP</th>
+									</tr>
+								</thead>
+								<tbody id="eventBody">
+									
+								</tbody>
+							</table>
 								
-							</tbody>
-						</table>		
       				</div>
       				<div class="modal-footer">
        					<button type="button" class="btn btn-primary" id="closeButton">Close</button>
@@ -58,6 +59,9 @@
 					<th scope="col">KP</th>
 					<th scope="col">XP</th>
 					<th scope="col">Lock</th>
+					<th scope="col">Death</th>
+					<th scope="col">Failed</th>
+					<th scope="col">Count</th>
 				</tr>
 			</thead>
 			<tbody id="tableBody">
@@ -74,13 +78,16 @@
 			var lockedUser;
 
 			class User{
-				constructor(id,hp,mp,kp,xp){
+				constructor(id,hp,mp,kp,xp,locked){
 					this.id=id;
 					this.hp=hp;
 					this.mp=mp;
 					this.kp=kp;
 					this.xp=xp;
-					this.locked=0;	
+					this.locked=locked;
+					this.death=0;
+					this.failed=0;	
+					this.eventCount=0;
 				}
 			}
 			class Event{
@@ -101,7 +108,7 @@
 					$("#tableBody").empty();
 					data.forEach(function(element,index){
 						console.log(element);
-						$("#tableBody").append("<tr><th scope=\"row\" id=\"rowUser"+element.id+"\">"+element.id+"</th><td>"+element.hp+"</td><td>"+element.mp+"</td><td>"+element.kp+"</td><td>"+element.xp+"</td><td id=\"locked"+element.id+"\">"+element.locked+"</td></tr>")
+						$("#tableBody").append("<tr><th scope=\"row\" id=\"rowUser"+element.id+"\">"+element.id+"</th><td>"+element.hp+"</td><td>"+element.mp+"</td><td>"+element.kp+"</td><td>"+element.xp+"</td><td id=\"locked"+element.id+"\">"+element.locked+"</td><td>"+element.death+"</td><td>"+element.failed+"</td><td>"+element.eventCount+"</td></tr>")
 					});
 					$("td").each(function(index){
 						var value=$(this).text();
@@ -112,7 +119,8 @@
 					$("th[id*='rowUser']").each(function(){
 						$(this).click(function(){
 							var user = $(this).attr('id');
-							userIndex=user[user.length-1];
+							userIndex=parseInt(user.substr(7));
+							//userIndex=user[user.length-1];
 							socket.emit('getEvent',userIndex);
 						})
 					})
