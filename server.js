@@ -168,7 +168,10 @@ io.on('connection', function(socket){
 				}
 				//status[username][0]++;
 				//console.log(username,scoreChange,2);
-				currentUser[index].applyScore(tmp);
+				if(currentUser[index]!=null){
+					currentUser[index].applyScore(tmp);
+				}
+				
 				io.emit('updateScore'+currentUser[index].id,currentUser[index]);
 			}
 	});
@@ -192,7 +195,9 @@ io.on('connection', function(socket){
 			randomEvent.kp+=userStat[index].modInt;
 			if(randomEvent.kp<0) randomEvent.kp=0;
 		}
+		if(currentUser[index]!=null){
 		currentUser[index].applyScore(randomEvent);
+	}
 		io.emit('updateScore'+currentUser[index].id,currentUser[index]);
 	});
 	socket.on("sendLocked",function(data){
@@ -235,17 +240,20 @@ io.on('connection', function(socket){
 	socket.on('console',function(data){
 		var index=getUserById(data[0],currentUser);
 		var tmp = new Event("Override",data[1],data[2],data[3],data[4]);
+		if(currentUser[index]!=null){
 		currentUser[index].applyScore(tmp);
 		userSelectedEvent[index].push(tmp);
-		io.emit('updateScore'+currentUser[index].id,currentUser[index]);
+		io.emit('updateScore'+currentUser[index].id,currentUser[index]);}
 	})
 	socket.on('consoleOverride', function(data){
 		var index=getUserById(data[0],currentUser);
 		var tmp = new Event("Override",data[1]-currentUser[index].hp,data[2]-currentUser[index].mp,data[3]-currentUser[index].kp,data[4]-currentUser[index].xp);
+		if(currentUser[index]!=null){
 		currentUser[index].applyScore(tmp);
 		userSelectedEvent[index].push(tmp);
 		currentUser[index].eventCount-=1;
 		io.emit('updateScore'+currentUser[index].id,currentUser[index]);
+	}
 	});
 	socket.on('sendStat',function(data){
 		var index= getUserById(data[0],currentUser);
