@@ -112,6 +112,7 @@
 						arr.push(parseInt($('#xp').val()));
 						console.log(arr);
 						socket.emit('console',arr);
+
 					}
 				});
 				$("#submitOverride").click(function(){
@@ -206,6 +207,7 @@
 				});
 
 				$("#submitEvent").click(function(){
+					socket.emit("showSignal",0);
 					socket.emit("eventSignal",1);
 				})
 			});
