@@ -152,7 +152,8 @@ io.on('connection', function(socket){
 
 		var tmp = new Event(scoreChange[0],scoreChange[1],scoreChange[2],scoreChange[3],scoreChange[4])
 		if(scoreChange[0]!=null){
-				userSelectedEvent[index].push(tmp);
+				if(currentUser[index]!=null){
+					userSelectedEvent[index].push(tmp);
 		
 				if(tmp.hp<0) {
 					tmp.hp+=userStat[index].modPhy;
@@ -168,11 +169,12 @@ io.on('connection', function(socket){
 				}
 				//status[username][0]++;
 				//console.log(username,scoreChange,2);
-				if(currentUser[index]!=null){
+				
 					currentUser[index].applyScore(tmp);
-				}
+				
 				
 				io.emit('updateScore'+currentUser[index].id,currentUser[index]);
+			}
 			}
 	});
 	socket.on('getEvent',function(data){
@@ -239,16 +241,18 @@ io.on('connection', function(socket){
 	});
 	socket.on('console',function(data){
 		var index=getUserById(data[0],currentUser);
-		var tmp = new Event("Override",data[1],data[2],data[3],data[4]);
 		if(currentUser[index]!=null){
+			var tmp = new Event("Override",data[1],data[2],data[3],data[4]);
+		
 		currentUser[index].applyScore(tmp);
 		userSelectedEvent[index].push(tmp);
 		io.emit('updateScore'+currentUser[index].id,currentUser[index]);}
 	})
 	socket.on('consoleOverride', function(data){
 		var index=getUserById(data[0],currentUser);
-		var tmp = new Event("Override",data[1]-currentUser[index].hp,data[2]-currentUser[index].mp,data[3]-currentUser[index].kp,data[4]-currentUser[index].xp);
 		if(currentUser[index]!=null){
+			var tmp = new Event("Override",data[1]-currentUser[index].hp,data[2]-currentUser[index].mp,data[3]-currentUser[index].kp,data[4]-currentUser[index].xp);
+		
 		currentUser[index].applyScore(tmp);
 		userSelectedEvent[index].push(tmp);
 		currentUser[index].eventCount-=1;
