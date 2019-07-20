@@ -236,7 +236,7 @@ io.on('connection', function(socket){
 		var index=getUserById(data[0],currentUser);
 		var tmp = new Event("Override",data[1],data[2],data[3],data[4]);
 		currentUser[index].applyScore(tmp);
-		userSelectedEvent[index].push(tmpEvent);
+		userSelectedEvent[index].push(tmp);
 		io.emit('updateScore'+currentUser[index].id,currentUser[index]);
 	})
 	socket.on('consoleOverride', function(data){
