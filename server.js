@@ -80,6 +80,7 @@ class User{
 
 		if(this.hp == 0 || this.mp ==0){
 			this.death++;
+			io.emit('changeColor'+this.id,'FF0000')
 		}
 		this.eventCount++;
 		return this.id;
@@ -220,6 +221,7 @@ io.on('connection', function(socket){
 			var tmp=element.kp;
 			if(element.kp<10) {
 				element.failed++;
+				io.emit('changeColor'+element.id,'FF0000');
 				io.emit('failed'+element.id,element.failed);
 			}
 			element.kp=Math.ceil((element.kp-10)/2);
